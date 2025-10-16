@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Building2, Heart, Plus, Users, Award } from 'lucide-react';
+import TemplateSelector from '@/components/TemplateSelector';
+import LogoUpload from '@/components/LogoUpload';
 
 interface Group {
   id: string;
@@ -46,6 +48,8 @@ export default function CreateEventPage() {
     hostName: '',
     hostEmail: '',
     awardsEnabled: false,
+    templateTheme: 'light' as 'light' | 'dark' | 'love',
+    logoUrl: '',
   });
 
   // Groups, guests and awards
@@ -365,6 +369,16 @@ export default function CreateEventPage() {
               This date will be visible to all invited guests
             </p>
           </div>
+
+          <TemplateSelector
+            selectedTemplate={eventData.templateTheme}
+            onTemplateSelect={(template) => handleEventDataChange('templateTheme', template)}
+          />
+
+          <LogoUpload
+            onLogoUploaded={(logoUrl) => handleEventDataChange('logoUrl', logoUrl)}
+            currentLogo={eventData.logoUrl}
+          />
 
           <div className="form-group">
             <label className="form-label">Host Name *</label>

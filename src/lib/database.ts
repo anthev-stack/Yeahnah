@@ -34,6 +34,8 @@ export const initializeDatabase = async () => {
         event_type TEXT NOT NULL CHECK (event_type IN ('business', 'personal')),
         multi_store_enabled BOOLEAN DEFAULT FALSE,
         event_date DATE NOT NULL,
+        template_theme TEXT DEFAULT 'light' CHECK (template_theme IN ('light', 'dark', 'love')),
+        logo_url TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         host_id TEXT NOT NULL,
         host_name TEXT,

@@ -9,13 +9,13 @@ export async function GET(
     await initializeDatabase();
     
     const resolvedParams = await params;
-    const guest = await dbGet(
-      `SELECT g.*, e.title as event_title, e.event_type, e.multi_store_enabled, e.event_date 
-       FROM guests g 
-       JOIN events e ON g.event_id = e.id 
-       WHERE g.guest_id = ?`,
-      [resolvedParams.guestId]
-    );
+        const guest = await dbGet(
+          `SELECT g.*, e.title as event_title, e.event_type, e.multi_store_enabled, e.event_date, e.template_theme, e.logo_url 
+           FROM guests g 
+           JOIN events e ON g.event_id = e.id 
+           WHERE g.guest_id = ?`,
+          [resolvedParams.guestId]
+        );
     
     if (!guest) {
       return NextResponse.json({ error: 'Guest not found' }, { status: 404 });
