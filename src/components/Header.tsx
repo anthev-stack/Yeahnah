@@ -21,34 +21,23 @@ const Header: React.FC = () => {
             <li>
               <Link href="/">
                 Home
-                <ChevronDown size={12} className="dropdown-arrow" />
-              </Link>
-            </li>
-            <li>
-              <Link href="/features">
-                Features
-                <ChevronDown size={12} className="dropdown-arrow" />
-              </Link>
-            </li>
-            <li>
-              <Link href="/pricing">
-                Pricing
-                <ChevronDown size={12} className="dropdown-arrow" />
-              </Link>
-            </li>
-            <li>
-              <Link href="/docs">
-                Docs
-                <ChevronDown size={12} className="dropdown-arrow" />
               </Link>
             </li>
             {session && (
-              <li>
-                <Link href="/create-event">
-                  <Users size={16} />
-                  Create Event
-                </Link>
-              </li>
+              <>
+                <li>
+                  <Link href="/events">
+                    <Users size={16} />
+                    View Events
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/create-event">
+                    <Users size={16} />
+                    Create Event
+                  </Link>
+                </li>
+              </>
             )}
           </ul>
         </nav>

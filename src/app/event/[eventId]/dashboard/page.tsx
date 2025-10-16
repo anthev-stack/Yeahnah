@@ -96,6 +96,7 @@ export default function EventDashboardPage() {
   }, [eventId, setCurrentEvent, setGuests, setAwards]);
 
   const getUniqueStores = () => {
+    if (!guests || !Array.isArray(guests)) return [];
     const stores = guests
       .map(g => g.store_department)
       .filter((store, index, arr) => store && arr.indexOf(store) === index);
@@ -103,6 +104,9 @@ export default function EventDashboardPage() {
   };
 
   const getRSVPStats = () => {
+    if (!guests || !Array.isArray(guests)) {
+      return { total: 0, yes: 0, no: 0, pending: 0 };
+    }
     const total = guests.length;
     const yes = guests.filter(g => g.rsvp_status === 'yes').length;
     const no = guests.filter(g => g.rsvp_status === 'no').length;
@@ -112,6 +116,7 @@ export default function EventDashboardPage() {
   };
 
   const getFilteredGuests = () => {
+    if (!guests || !Array.isArray(guests)) return [];
     let filtered = guests;
     
     if (selectedStore !== 'all') {
@@ -122,6 +127,7 @@ export default function EventDashboardPage() {
   };
 
   const getFilteredResults = () => {
+    if (!results || !Array.isArray(results)) return [];
     let filtered = results;
     
     if (selectedAward !== 'all') {
@@ -136,6 +142,7 @@ export default function EventDashboardPage() {
   };
 
   const generateShareLinks = () => {
+    if (!guests || !Array.isArray(guests)) return [];
     const shareLinks = guests
       .filter(g => g.guest_id)
       .map(g => ({
