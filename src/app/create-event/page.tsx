@@ -5,13 +5,17 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Building2, Heart, Plus, Users, Award } from 'lucide-react';
 
+interface Group {
+  id: string;
+  name: string;
+}
+
 interface Guest {
   id: string;
   firstName: string;
   lastName: string;
-  email: string;
   guestId: string;
-  storeDepartment: string;
+  groupId: string;
 }
 
 interface Award {
@@ -43,9 +47,11 @@ export default function CreateEventPage() {
     awardsEnabled: false,
   });
 
-  // Guests and awards
+  // Groups, guests and awards
+  const [groups, setGroups] = useState<Group[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [awards, setAwards] = useState<Award[]>([]);
+  const [groupName, setGroupName] = useState('');
 
   const handleEventDataChange = (field: string, value: any) => {
     setEventData(prev => ({
@@ -54,14 +60,29 @@ export default function CreateEventPage() {
     }));
   };
 
-  const addGuest = () => {
+  const addGroup = () => {
+    if (groupName.trim()) {
+      const newGroup: Group = {
+        id: Date.now().toString(),
+        name: groupName.trim()
+      };
+      setGroups([...groups, newGroup]);
+      setGroupName('');
+    }
+  };
+
+  const removeGroup = (groupId: string) => {
+    setGroups(groups.filter(g => g.id !== groupId));
+    setGuests(guests.filter(g => g.groupId !== groupId));
+  };
+
+  const addGuest = (groupId: string) => {
     const newGuest: Guest = {
-      id: Date.now().toString(),
+      id: Date.now().toString() + Math.random(),
       firstName: '',
       lastName: '',
-      email: '',
       guestId: '',
-      storeDepartment: ''
+      groupId: groupId
     };
     setGuests([...guests, newGuest]);
   };
@@ -117,18 +138,43 @@ export default function CreateEventPage() {
       const eventResult = await eventResponse.json();
       const newEventId = eventResult.eventId;
 
+      // Add groups
+      for (const group of groups) {
+        await fetch(`/api/events/${newEventId}/groups`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: group.name
+          })
+        });
+      }
+
+      // Wait a moment for groups to be created, then add guests
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Fetch created groups to get their database IDs
+      const groupsResponse = await fetch(`/api/events/${newEventId}/groups`);
+      const createdGroups = await groupsResponse.json();
+
+      // Create a mapping from temporary IDs to database IDs
+      const groupIdMap: { [key: string]: string } = {};
+      groups.forEach((group, index) => {
+        if (createdGroups[index]) {
+          groupIdMap[group.id] = createdGroups[index].id;
+        }
+      });
+
       // Add guests
       for (const guest of guests) {
-        if (guest.firstName && guest.lastName) {
+        if (guest.firstName) {
           await fetch(`/api/events/${newEventId}/guests`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               firstName: guest.firstName,
-              lastName: guest.lastName,
-              email: guest.email,
-              guestId: guest.guestId,
-              storeDepartment: guest.storeDepartment
+              lastName: guest.lastName || '',
+              guestId: guest.guestId || '',
+              groupId: groupIdMap[guest.groupId] || null
             })
           });
         }
@@ -244,16 +290,64 @@ export default function CreateEventPage() {
           </div>
 
           {eventData.eventType === 'business' && (
-            <div className="form-checkbox">
-              <input
-                type="checkbox"
-                id="multiStore"
-                checked={eventData.multiStoreEnabled}
-                onChange={(e) => handleEventDataChange('multiStoreEnabled', e.target.checked)}
-              />
-              <label htmlFor="multiStore">
-                Enable multi-store/department functionality
-              </label>
+            <div className="form-group">
+              <div className="form-checkbox">
+                <input
+                  type="checkbox"
+                  id="multiStore"
+                  checked={eventData.multiStoreEnabled}
+                  onChange={(e) => handleEventDataChange('multiStoreEnabled', e.target.checked)}
+                />
+                <label htmlFor="multiStore">
+                  Enable multi-group functionality (stores, departments, states, etc.)
+                </label>
+              </div>
+              
+              {eventData.multiStoreEnabled && (
+                <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid #e1e5e9', borderRadius: '8px' }}>
+                  <h4 style={{ marginBottom: '1rem' }}>Create Groups</h4>
+                  <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>
+                    Add groups like "Store 1", "Marketing Department", "California", etc.
+                  </p>
+                  
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={groupName}
+                      onChange={(e) => setGroupName(e.target.value)}
+                      placeholder="e.g., Store 1, Marketing, California"
+                      onKeyPress={(e) => e.key === 'Enter' && addGroup()}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={addGroup}
+                    >
+                      <Plus size={16} />
+                      Add Group
+                    </button>
+                  </div>
+                  
+                  {groups.length > 0 && (
+                    <div className="grid grid-3" style={{ gap: '0.5rem' }}>
+                      {groups.map((group) => (
+                        <div key={group.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                          <span className="text-sm font-medium">{group.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeGroup(group.id)}
+                            className="text-red-500 hover:text-red-700"
+                            style={{ fontSize: '0.8rem' }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -304,87 +398,154 @@ export default function CreateEventPage() {
         <div>
           <div className="flex justify-between items-center mb-3">
             <h3>Add Guests</h3>
-            <button className="btn btn-secondary" onClick={addGuest}>
-              <Plus size={16} />
-              Add Guest
-            </button>
           </div>
 
-          {guests.map((guest, index) => (
-            <div key={guest.id} className="card" style={{ marginBottom: '1rem' }}>
-              <div className="flex justify-between items-center mb-2">
-                <h4>Guest {index + 1}</h4>
-                <button 
-                  className="btn btn-danger"
-                  onClick={() => removeGuest(index)}
-                  style={{ padding: '0.5rem' }}
-                >
-                  Remove
+          {eventData.multiStoreEnabled && groups.length > 0 ? (
+            <div>
+              <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+                Add guests to each group. Click the "+" button in each column to add a new guest.
+              </p>
+              
+              <div className="overflow-x-auto">
+                <div className="grid" style={{ 
+                  gridTemplateColumns: `repeat(${groups.length}, 1fr)`,
+                  gap: '1rem',
+                  minWidth: `${groups.length * 250}px`
+                }}>
+                  {groups.map((group) => {
+                    const groupGuests = guests.filter(g => g.groupId === group.id);
+                    return (
+                      <div key={group.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="font-semibold text-center w-full">{group.name}</h4>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={() => addGuest(group.id)}
+                            style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }}
+                          >
+                            <Plus size={14} />
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {groupGuests.map((guest, guestIndex) => {
+                            const globalIndex = guests.findIndex(g => g.id === guest.id);
+                            return (
+                              <div key={guest.id} className="p-2 bg-gray-50 rounded border">
+                                <div className="grid grid-1 gap-2">
+                                  <input
+                                    type="text"
+                                    className="form-input"
+                                    style={{ padding: '0.5rem', fontSize: '0.9rem' }}
+                                    value={guest.firstName}
+                                    onChange={(e) => updateGuest(globalIndex, 'firstName', e.target.value)}
+                                    placeholder="First Name *"
+                                  />
+                                  <input
+                                    type="text"
+                                    className="form-input"
+                                    style={{ padding: '0.5rem', fontSize: '0.9rem' }}
+                                    value={guest.lastName}
+                                    onChange={(e) => updateGuest(globalIndex, 'lastName', e.target.value)}
+                                    placeholder="Last Name (optional)"
+                                  />
+                                  <input
+                                    type="text"
+                                    className="form-input"
+                                    style={{ padding: '0.5rem', fontSize: '0.9rem' }}
+                                    value={guest.guestId}
+                                    onChange={(e) => updateGuest(globalIndex, 'guestId', e.target.value)}
+                                    placeholder="Guest ID (optional)"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeGuest(globalIndex)}
+                                  className="text-red-500 hover:text-red-700 mt-1"
+                                  style={{ fontSize: '0.7rem' }}
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            );
+                          })}
+                          
+                          {groupGuests.length === 0 && (
+                            <div className="text-center text-gray-500 text-sm py-4">
+                              Click + to add guests
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <button className="btn btn-secondary" onClick={() => addGuest('default')}>
+                  <Plus size={16} />
+                  Add Guest
                 </button>
               </div>
-              
-              <div className="grid grid-2" style={{ gap: '1rem' }}>
-                <div>
-                  <label className="form-label">First Name *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={guest.firstName}
-                    onChange={(e) => updateGuest(index, 'firstName', e.target.value)}
-                    placeholder="John"
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Last Name *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={guest.lastName}
-                    onChange={(e) => updateGuest(index, 'lastName', e.target.value)}
-                    placeholder="Doe"
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Email</label>
-                  <input
-                    type="email"
-                    className="form-input"
-                    value={guest.email}
-                    onChange={(e) => updateGuest(index, 'email', e.target.value)}
-                    placeholder="john.doe@example.com"
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Guest ID (Optional)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={guest.guestId}
-                    onChange={(e) => updateGuest(index, 'guestId', e.target.value)}
-                    placeholder="Unique ID for easy RSVP access"
-                  />
-                </div>
-              </div>
 
-              {eventData.multiStoreEnabled && (
-                <div style={{ marginTop: '1rem' }}>
-                  <label className="form-label">Store/Department</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={guest.storeDepartment}
-                    onChange={(e) => updateGuest(index, 'storeDepartment', e.target.value)}
-                    placeholder="e.g., Store A, Marketing, Sales"
-                  />
+              {guests.map((guest, index) => (
+                <div key={guest.id} className="card" style={{ marginBottom: '1rem' }}>
+                  <div className="flex justify-between items-center mb-2">
+                    <h4>Guest {index + 1}</h4>
+                    <button 
+                      className="btn btn-danger"
+                      onClick={() => removeGuest(index)}
+                      style={{ padding: '0.5rem' }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-2" style={{ gap: '1rem' }}>
+                    <div>
+                      <label className="form-label">First Name *</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={guest.firstName}
+                        onChange={(e) => updateGuest(index, 'firstName', e.target.value)}
+                        placeholder="John"
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">Last Name (Optional)</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={guest.lastName}
+                        onChange={(e) => updateGuest(index, 'lastName', e.target.value)}
+                        placeholder="Doe"
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">Guest ID (Optional)</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={guest.guestId}
+                        onChange={(e) => updateGuest(index, 'guestId', e.target.value)}
+                        placeholder="Unique ID for easy RSVP access"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {guests.length === 0 && (
+                <div className="text-center" style={{ padding: '2rem', color: '#666' }}>
+                  <Users size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                  <p>No guests added yet. Click "Add Guest" to get started.</p>
                 </div>
               )}
-            </div>
-          ))}
-
-          {guests.length === 0 && (
-            <div className="text-center" style={{ padding: '2rem', color: '#666' }}>
-              <Users size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-              <p>No guests added yet. Click "Add Guest" to get started.</p>
             </div>
           )}
 

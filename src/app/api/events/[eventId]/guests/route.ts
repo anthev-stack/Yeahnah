@@ -8,14 +8,14 @@ export async function POST(
   try {
     await initializeDatabase();
     
-    const { firstName, lastName, email, guestId, storeDepartment } = await request.json();
+    const { firstName, lastName, guestId, groupId } = await request.json();
     const guestUuid = uuidv4();
     const resolvedParams = await params;
     
     await dbRun(
-      `INSERT INTO guests (id, event_id, first_name, last_name, email, guest_id, store_department) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [guestUuid, resolvedParams.eventId, firstName, lastName, email, guestId, storeDepartment]
+      `INSERT INTO guests (id, event_id, first_name, last_name, guest_id, group_id) 
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [guestUuid, resolvedParams.eventId, firstName, lastName, guestId, groupId]
     );
     
     return NextResponse.json({ guestId: guestUuid, message: 'Guest added successfully' });
@@ -34,7 +34,9 @@ export async function GET(
     
     const resolvedParams = await params;
     const guests = await dbQuery(
-      'SELECT * FROM guests WHERE event_id = ? ORDER BY last_name, first_name',
+      `SELECT g.*, gr.name as group_name FROM guests g 
+       LEFT JOIN groups gr ON g.group_id = gr.id 
+       WHERE g.event_id = ? ORDER BY gr.name, g.first_name`,
       [resolvedParams.eventId]
     );
     

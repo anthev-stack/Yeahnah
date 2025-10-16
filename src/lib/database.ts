@@ -41,19 +41,30 @@ export const initializeDatabase = async () => {
       )
     `);
 
+    // Create groups table (for stores, departments, states, etc.)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS groups (
+        id TEXT PRIMARY KEY,
+        event_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
+      )
+    `);
+
     // Create guests table
     await client.query(`
       CREATE TABLE IF NOT EXISTS guests (
         id TEXT PRIMARY KEY,
         event_id TEXT NOT NULL,
         first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        email TEXT,
+        last_name TEXT,
         guest_id TEXT UNIQUE,
-        store_department TEXT,
+        group_id TEXT,
         rsvp_status TEXT CHECK (rsvp_status IN ('yes', 'no', 'pending')) DEFAULT 'pending',
         rsvp_date TIMESTAMP,
-        FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
+        FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE,
+        FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE SET NULL
       )
     `);
 
@@ -100,6 +111,10 @@ export const initializeDatabase = async () => {
     
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_votes_event_id ON votes(event_id)
+    `);
+    
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_groups_event_id ON groups(event_id)
     `);
 
   } finally {
