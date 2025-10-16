@@ -47,7 +47,7 @@ export async function POST(
       [response, resolvedParams.guestId]
     );
     
-    if (result.changes === 0) {
+    if (result.rowCount === 0) {
       return NextResponse.json({ error: 'Guest not found' }, { status: 404 });
     }
     

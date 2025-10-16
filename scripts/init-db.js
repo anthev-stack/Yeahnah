@@ -1,19 +1,17 @@
-import { Pool } from 'pg';
-import { v4 as uuidv4 } from 'uuid';
+const { Pool } = require('pg');
+require('dotenv').config({ path: '.env.local' });
 
-// PostgreSQL connection pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
 });
 
-// Initialize database tables
-export const initializeDatabase = async () => {
+async function initializeDatabase() {
   const client = await pool.connect();
+  
   try {
+    console.log('🚀 Initializing PostgreSQL database...');
+
     // Create users table
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -24,6 +22,7 @@ export const initializeDatabase = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    console.log('✅ Users table created/verified');
 
     // Create events table
     await client.query(`
@@ -40,6 +39,7 @@ export const initializeDatabase = async () => {
         FOREIGN KEY (host_id) REFERENCES users (id) ON DELETE CASCADE
       )
     `);
+    console.log('✅ Events table created/verified');
 
     // Create guests table
     await client.query(`
@@ -56,6 +56,7 @@ export const initializeDatabase = async () => {
         FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
       )
     `);
+    console.log('✅ Guests table created/verified');
 
     // Create awards table
     await client.query(`
@@ -68,6 +69,7 @@ export const initializeDatabase = async () => {
         FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
       )
     `);
+    console.log('✅ Awards table created/verified');
 
     // Create votes table
     await client.query(`
@@ -84,67 +86,37 @@ export const initializeDatabase = async () => {
         FOREIGN KEY (nominee_id) REFERENCES guests (id) ON DELETE CASCADE
       )
     `);
+    console.log('✅ Votes table created/verified');
 
     // Create indexes for better performance
-    await client.query(`
-      CREATE INDEX IF NOT EXISTS idx_guests_event_id ON guests(event_id)
-    `);
-    
-    await client.query(`
-      CREATE INDEX IF NOT EXISTS idx_guests_guest_id ON guests(guest_id)
-    `);
-    
-    await client.query(`
-      CREATE INDEX IF NOT EXISTS idx_awards_event_id ON awards(event_id)
-    `);
-    
-    await client.query(`
-      CREATE INDEX IF NOT EXISTS idx_votes_event_id ON votes(event_id)
-    `);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_guests_event_id ON guests(event_id)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_guests_guest_id ON guests(guest_id)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_awards_event_id ON awards(event_id)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_votes_event_id ON votes(event_id)`);
+    console.log('✅ Database indexes created/verified');
 
+    console.log('🎉 Database initialization completed successfully!');
+
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    throw error;
   } finally {
     client.release();
+    await pool.end();
   }
-};
+}
 
-// Helper function to convert SQLite ? syntax to PostgreSQL $1, $2 syntax
-const convertToPostgresParams = (text: string, params: any[]): { query: string; params: any[] } => {
-  let paramIndex = 1;
-  const convertedQuery = text.replace(/\?/g, () => `$${paramIndex++}`);
-  return { query: convertedQuery, params };
-};
+// Run initialization if called directly
+if (require.main === module) {
+  initializeDatabase()
+    .then(() => {
+      console.log('✅ Database setup complete!');
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('❌ Database setup failed:', error);
+      process.exit(1);
+    });
+}
 
-export const dbQuery = async (text: string, params: any[] = []): Promise<any[]> => {
-  const client = await pool.connect();
-  try {
-    const { query, params: convertedParams } = convertToPostgresParams(text, params);
-    const result = await client.query(query, convertedParams);
-    return result.rows;
-  } finally {
-    client.release();
-  }
-};
-
-export const dbRun = async (text: string, params: any[] = []): Promise<{ rowCount: number }> => {
-  const client = await pool.connect();
-  try {
-    const { query, params: convertedParams } = convertToPostgresParams(text, params);
-    const result = await client.query(query, convertedParams);
-    return { rowCount: result.rowCount || 0 };
-  } finally {
-    client.release();
-  }
-};
-
-export const dbGet = async (text: string, params: any[] = []): Promise<any> => {
-  const client = await pool.connect();
-  try {
-    const { query, params: convertedParams } = convertToPostgresParams(text, params);
-    const result = await client.query(query, convertedParams);
-    return result.rows[0] || null;
-  } finally {
-    client.release();
-  }
-};
-
-export { uuidv4 };
+module.exports = { initializeDatabase };

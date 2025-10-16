@@ -36,7 +36,7 @@ Yeahnah is a comprehensive RSVP management platform built with **Next.js** and d
 - **Next.js 15** with App Router
 - **React 19** with TypeScript
 - **NextAuth.js** for authentication
-- **SQLite** database (in-memory for demo)
+- **PostgreSQL** database with Neon hosting
 - **Tailwind CSS** for styling
 - **Lucide React** for modern icons
 - **API Routes** for backend functionality
@@ -60,19 +60,25 @@ Yeahnah is a comprehensive RSVP management platform built with **Next.js** and d
    npm install
    ```
 
-3. **Set up environment variables (Optional)**
+3. **Set up environment variables**
    Create a `.env.local` file in the root directory:
    ```bash
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=your-secret-key-here
+   DATABASE_URL=your_postgresql_connection_string
    ```
 
-4. **Start the development server**
+4. **Initialize the database (Required for first run)**
+   ```bash
+   npm run init-db
+   ```
+
+5. **Start the development server**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
+6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 📁 Project Structure
