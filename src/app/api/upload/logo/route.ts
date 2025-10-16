@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,9 +9,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 });
+    // Validate file type - support more image formats including WebP
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'Only image files (JPEG, PNG, GIF, WebP) are allowed' }, { status: 400 });
     }
 
     // Validate file size (max 5MB)
@@ -21,24 +20,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 });
     }
 
+    // Convert file to base64 for storage
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'logos');
-    await mkdir(uploadsDir, { recursive: true });
-
-    // Generate unique filename
-    const timestamp = Date.now();
-    const fileExtension = file.name.split('.').pop();
-    const filename = `logo_${timestamp}.${fileExtension}`;
-    const filepath = join(uploadsDir, filename);
-
-    // Save file
-    await writeFile(filepath, buffer);
-
-    // Return the public URL
-    const logoUrl = `/uploads/logos/${filename}`;
+    const base64 = buffer.toString('base64');
+    
+    // Generate data URL
+    const logoUrl = `data:${file.type};base64,${base64}`;
 
     return NextResponse.json({ 
       success: true, 
@@ -51,3 +39,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to upload logo' }, { status: 500 });
   }
 }
+

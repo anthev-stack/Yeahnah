@@ -109,3 +109,4 @@ export const EventProvider: React.FC<EventProviderProps> = ({ children }) => {
     </EventContext.Provider>
   );
 };
+

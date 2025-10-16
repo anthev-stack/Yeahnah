@@ -140,6 +140,12 @@ export default function CreateEventPage() {
           hostEmail: session.user.email
         })
       });
+      
+      if (!eventResponse.ok) {
+        const errorResult = await eventResponse.json();
+        throw new Error(errorResult.error || 'Failed to create event');
+      }
+      
       const eventResult = await eventResponse.json();
       const newEventId = eventResult.eventId;
 

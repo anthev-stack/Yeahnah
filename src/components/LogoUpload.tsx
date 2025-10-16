@@ -42,8 +42,9 @@ export default function LogoUpload({ onLogoUploaded, currentLogo }: LogoUploadPr
 
   const handleFileUpload = async (file: File) => {
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
       return;
     }
 
@@ -132,7 +133,7 @@ export default function LogoUpload({ onLogoUploaded, currentLogo }: LogoUploadPr
                   <strong>Click to upload</strong> or drag and drop
                 </p>
                 <p className="upload-subtitle">
-                  PNG, JPG, GIF up to 5MB
+                  PNG, JPG, GIF, WebP up to 5MB
                 </p>
               </>
             )}
@@ -146,3 +147,4 @@ export default function LogoUpload({ onLogoUploaded, currentLogo }: LogoUploadPr
     </div>
   );
 }
+

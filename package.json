@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "init-db": "node scripts/init-db.js",
+    "migrate-db": "node scripts/migrate-db.js",
     "test-cleanup": "node scripts/test-cleanup.js"
   },
   "keywords": [

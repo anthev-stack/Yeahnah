@@ -65,3 +65,4 @@ export async function DELETE(
     return NextResponse.json({ error: 'Failed to delete group' }, { status: 500 });
   }
 }
+

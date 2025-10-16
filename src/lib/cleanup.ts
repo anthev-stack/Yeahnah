@@ -122,3 +122,4 @@ const generateEventSummary = async (event: any): Promise<EventSummary | null> =>
     return null;
   }
 };
+
