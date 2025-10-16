@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Users, Award, TrendingUp, Filter, Download, Share2, Plus } from 'lucide-react';
+import { Users, Award, TrendingUp, Filter, Download, Share2, Plus, Copy, Check, Link2 } from 'lucide-react';
 import { useEvent } from '@/context/EventContext';
 
 interface EventData {
@@ -55,6 +55,8 @@ export default function EventDashboardPage() {
   const [activeTab, setActiveTab] = useState<'rsvp' | 'awards'>('rsvp');
   const [selectedStore, setSelectedStore] = useState<string>('all');
   const [selectedAward, setSelectedAward] = useState<string>('all');
+  const [copiedLinks, setCopiedLinks] = useState<Set<string>>(new Set());
+  const [bulkCopied, setBulkCopied] = useState(false);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -147,10 +149,48 @@ export default function EventDashboardPage() {
       .filter(g => g.guest_id)
       .map(g => ({
         guest: `${g.first_name} ${g.last_name}`,
-        link: `${window.location.origin}/rsvp/${g.guest_id}`
+        link: `${window.location.origin}/rsvp/${g.guest_id}`,
+        guestId: g.guest_id
       }));
     
     return shareLinks;
+  };
+
+  const copyToClipboard = async (text: string, guestId?: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      
+      if (guestId) {
+        setCopiedLinks(prev => new Set([...prev, guestId]));
+        setTimeout(() => {
+          setCopiedLinks(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(guestId);
+            return newSet;
+          });
+        }, 2000);
+      } else {
+        setBulkCopied(true);
+        setTimeout(() => setBulkCopied(false), 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const copyAllLinks = () => {
+    const shareLinks = generateShareLinks();
+    const allLinksText = shareLinks
+      .map(link => `${link.guest}: ${link.link}`)
+      .join('\n');
+    copyToClipboard(allLinksText);
   };
 
   const exportToCSV = () => {
@@ -325,31 +365,82 @@ export default function EventDashboardPage() {
 
           {shareLinks.length > 0 && (
             <div style={{ marginTop: '2rem' }}>
-              <h4 style={{ marginBottom: '1rem' }}>Share Links</h4>
+              <div className="flex justify-between items-center mb-4">
+                <h4 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Link2 size={20} />
+                  Guest Invite Links
+                </h4>
+                <div className="flex gap-2">
+                  <button
+                    className={`btn ${bulkCopied ? 'btn-success' : 'btn-secondary'}`}
+                    onClick={copyAllLinks}
+                    style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+                  >
+                    {bulkCopied ? (
+                      <>
+                        <Check size={16} style={{ marginRight: '0.5rem' }} />
+                        Copied All!
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} style={{ marginRight: '0.5rem' }} />
+                        Copy All Links
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+              
               <div className="list">
-                {shareLinks.map((link, index) => (
-                  <div key={index} className="list-item">
-                    <div className="flex justify-between items-center">
-                      <span>{link.guest}</span>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={link.link}
-                          readOnly
-                          className="form-input"
-                          style={{ width: '300px', fontSize: '0.8rem' }}
-                        />
-                        <button
-                          className="btn btn-secondary"
-                          onClick={() => navigator.clipboard.writeText(link.link)}
-                          style={{ padding: '0.5rem' }}
-                        >
-                          <Share2 size={14} />
-                        </button>
+                {shareLinks.map((link, index) => {
+                  const isCopied = copiedLinks.has(link.guestId!);
+                  return (
+                    <div key={index} className="list-item">
+                      <div className="flex justify-between items-center">
+                        <div className="flex flex-col">
+                          <span style={{ fontWeight: '500' }}>{link.guest}</span>
+                          <span style={{ fontSize: '0.8rem', color: '#888' }}>
+                            Guest ID: {link.guestId}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={link.link}
+                            readOnly
+                            className="form-input"
+                            style={{ width: '350px', fontSize: '0.8rem' }}
+                            onClick={(e) => (e.target as HTMLInputElement).select()}
+                          />
+                          <button
+                            className={`btn ${isCopied ? 'btn-success' : 'btn-secondary'}`}
+                            onClick={() => copyToClipboard(link.link, link.guestId)}
+                            style={{ padding: '0.5rem', minWidth: '40px' }}
+                            title={isCopied ? 'Copied!' : 'Copy link'}
+                          >
+                            {isCopied ? (
+                              <Check size={14} />
+                            ) : (
+                              <Copy size={14} />
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+              
+              <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(0, 255, 136, 0.1)', borderRadius: '8px', border: '1px solid rgba(0, 255, 136, 0.3)' }}>
+                <h5 style={{ margin: '0 0 0.5rem 0', color: 'var(--accent-green)' }}>
+                  💡 Pro Tips:
+                </h5>
+                <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
+                  <li>Click on any link to select it for manual copying</li>
+                  <li>Use "Copy All Links" to get all links in a formatted list</li>
+                  <li>Share individual links via email, text, or social media</li>
+                  <li>Guests can RSVP without creating an account</li>
+                </ul>
               </div>
             </div>
           )}

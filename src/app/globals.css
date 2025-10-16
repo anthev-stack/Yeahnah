@@ -831,6 +831,78 @@ body::before {
   line-height: 1.4;
 }
 
+/* Copy Link Styles */
+.copy-link-section {
+  margin-top: 2rem;
+}
+
+.copy-link-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.copy-link-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.copy-link-input {
+  width: 350px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.copy-link-input:hover {
+  background: rgba(0, 255, 136, 0.05);
+  border-color: var(--accent-green);
+}
+
+.copy-link-button {
+  padding: 0.5rem;
+  min-width: 40px;
+  transition: all 0.2s ease;
+}
+
+.copy-link-button:hover {
+  transform: scale(1.05);
+}
+
+.copy-link-button.copied {
+  background: var(--accent-green);
+  color: #000;
+}
+
+.copy-tips {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0, 255, 136, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.copy-tips h5 {
+  margin: 0 0 0.5rem 0;
+  color: var(--accent-green);
+}
+
+.copy-tips ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.copy-tips li {
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
 /* Text Colors */
 .text-white { color: #ffffff; }
 .text-gray { color: #888; }
