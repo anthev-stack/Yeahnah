@@ -3,163 +3,170 @@
 import React from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { Calendar, Users, Award, Building2, Heart, LogIn } from 'lucide-react';
+import { Calendar, Users, Award, Building2, Heart, LogIn, ArrowRight, Globe, Zap } from 'lucide-react';
 
 export default function HomePage() {
   const { data: session } = useSession();
 
   return (
-    <div className="text-center">
-      <div className="card">
-        <div className="card-header">
-          <h1 className="card-title" style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-            Welcome to Yeahnah
-          </h1>
-          <p className="card-subtitle" style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
-            Streamline your RSVP management for both personal and business events
-          </p>
-          {session && (
-            <p className="text-green-600 font-medium" style={{ fontSize: '1rem', marginBottom: '1rem' }}>
-              Welcome back, {session.user?.name}! Ready to create your next event?
-            </p>
-          )}
-        </div>
-
-        <div className="grid grid-2" style={{ marginBottom: '3rem' }}>
-          <div className="card">
-            <Building2 size={48} color="#667eea" style={{ marginBottom: '1rem' }} />
-            <h3 style={{ marginBottom: '1rem' }}>Business Events</h3>
-            <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-              Perfect for work functions, Christmas parties, end-of-year celebrations, and meetings.
-            </p>
-            <ul style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
-              <li>• Multi-store/department support</li>
-              <li>• Award voting system</li>
-              <li>• Store-specific leaderboards</li>
-              <li>• Professional guest management</li>
-            </ul>
-          </div>
-
-          <div className="card">
-            <Heart size={48} color="#764ba2" style={{ marginBottom: '1rem' }} />
-            <h3 style={{ marginBottom: '1rem' }}>Personal Events</h3>
-            <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-              Ideal for birthdays, weddings, engagement parties, and casual gatherings.
-            </p>
-            <ul style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
-              <li>• Simple RSVP management</li>
-              <li>• Custom guest IDs</li>
-              <li>• Easy sharing via links</li>
-              <li>• Award voting (optional)</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="card" style={{ marginBottom: '2rem' }}>
-          <Award size={32} color="#667eea" style={{ marginBottom: '1rem' }} />
-          <h3 style={{ marginBottom: '1rem' }}>Award Voting System</h3>
-          <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-            Let your attendees vote for colleagues and friends. Perfect for recognizing outstanding team members or celebrating special moments.
-          </p>
-          <div className="grid grid-3">
-            <div>
-              <strong>Custom Awards</strong>
-              <p style={{ fontSize: '0.9rem', color: '#666' }}>Create your own award categories</p>
-            </div>
-            <div>
-              <strong>Store Filtering</strong>
-              <p style={{ fontSize: '0.9rem', color: '#666' }}>Vote within departments or stores</p>
-            </div>
-            <div>
-              <strong>Leaderboards</strong>
-              <p style={{ fontSize: '0.9rem', color: '#666' }}>See top performers instantly</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-center gap-4">
+    <div>
+      {/* Hero Section */}
+      <div className="text-center" style={{ padding: '4rem 0' }}>
+        <h1 style={{ 
+          fontSize: '3.5rem', 
+          fontWeight: '700', 
+          marginBottom: '1.5rem',
+          background: 'linear-gradient(135deg, #ffffff 0%, #888 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
+          Streamline RSVP management with Yeahnah
+        </h1>
+        <p style={{ 
+          fontSize: '1.2rem', 
+          color: '#888', 
+          marginBottom: '2rem',
+          maxWidth: '600px',
+          margin: '0 auto 2rem'
+        }}>
+          Yeahnah provides the tools and platform to build, manage, and track events for both personal celebrations and business gatherings.
+        </p>
+        
+        <div className="flex justify-center gap-4" style={{ marginBottom: '3rem' }}>
           {session ? (
             <Link href="/create-event" className="btn btn-primary btn-large">
               <Calendar size={20} />
               Create New Event
+              <ArrowRight size={16} />
             </Link>
           ) : (
             <Link href="/auth/signup" className="btn btn-primary btn-large">
-              <LogIn size={20} />
-              Get Started - Sign Up
+              Get Started
+              <ArrowRight size={16} />
             </Link>
           )}
+          <Link href="/contact" className="btn btn-secondary btn-large">
+            Talk to an Expert
+          </Link>
+        </div>
+
+        {session && (
+          <p className="text-green" style={{ fontSize: '1rem', marginBottom: '2rem' }}>
+            Welcome back, {session.user?.name}! Ready to create your next event?
+          </p>
+        )}
+      </div>
+
+      {/* Features Grid */}
+      <div className="grid grid-2" style={{ marginBottom: '4rem' }}>
+        <div className="card">
+          <div className="flex items-center gap-2 mb-3">
+            <Building2 size={24} />
+            <h3>Business Events</h3>
+          </div>
+          <p style={{ color: '#888', marginBottom: '1.5rem' }}>
+            Perfect for work functions, Christmas parties, meetings, and corporate gatherings
+          </p>
+          <ul style={{ color: '#888', fontSize: '0.9rem', lineHeight: '1.8' }}>
+            <li>• Multi-group support (stores, departments, regions)</li>
+            <li>• Award voting systems with leaderboards</li>
+            <li>• Professional analytics and reporting</li>
+            <li>• Team collaboration features</li>
+          </ul>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center gap-2 mb-3">
+            <Heart size={24} />
+            <h3>Personal Events</h3>
+          </div>
+          <p style={{ color: '#888', marginBottom: '1.5rem' }}>
+            Ideal for birthdays, weddings, engagement parties, and casual get-togethers
+          </p>
+          <ul style={{ color: '#888', fontSize: '0.9rem', lineHeight: '1.8' }}>
+            <li>• Simple RSVP management</li>
+            <li>• Guest ID system for easy access</li>
+            <li>• Beautiful invitation sharing</li>
+            <li>• Intuitive guest experience</li>
+          </ul>
         </div>
       </div>
 
+      {/* How It Works */}
       <div className="card">
-        <h3 style={{ marginBottom: '1.5rem' }}>How It Works</h3>
+        <h3 style={{ marginBottom: '2rem', textAlign: 'center' }}>How It Works</h3>
         <div className="grid grid-3">
           <div className="text-center">
-            <div style={{ 
-              width: '60px', 
-              height: '60px', 
-              borderRadius: '50%', 
-              background: 'linear-gradient(135deg, #667eea, #764ba2)',
-              color: 'white',
+            <div style={{
+              background: 'rgba(0, 255, 136, 0.1)',
+              color: '#00ff88',
+              borderRadius: '50%',
+              width: '60px',
+              height: '60px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '1.5rem',
               fontWeight: 'bold',
               margin: '0 auto 1rem'
-            }}>
-              1
-            </div>
+            }}>1</div>
             <h4 style={{ marginBottom: '0.5rem' }}>Create Event</h4>
-            <p style={{ fontSize: '0.9rem', color: '#666' }}>
-              Choose business or personal event type and add your details
-            </p>
+            <p style={{ fontSize: '0.9rem', color: '#888' }}>Set up your event with custom details and guest lists</p>
           </div>
-
           <div className="text-center">
-            <div style={{ 
-              width: '60px', 
-              height: '60px', 
-              borderRadius: '50%', 
-              background: 'linear-gradient(135deg, #667eea, #764ba2)',
-              color: 'white',
+            <div style={{
+              background: 'rgba(0, 255, 136, 0.1)',
+              color: '#00ff88',
+              borderRadius: '50%',
+              width: '60px',
+              height: '60px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '1.5rem',
               fontWeight: 'bold',
               margin: '0 auto 1rem'
-            }}>
-              2
-            </div>
-            <h4 style={{ marginBottom: '0.5rem' }}>Add Guests</h4>
-            <p style={{ fontSize: '0.9rem', color: '#666' }}>
-              Invite your guests with optional IDs for easy RSVP access
-            </p>
+            }}>2</div>
+            <h4 style={{ marginBottom: '0.5rem' }}>Share Invitations</h4>
+            <p style={{ fontSize: '0.9rem', color: '#888' }}>Send unique links to your guests for easy RSVP</p>
           </div>
-
           <div className="text-center">
-            <div style={{ 
-              width: '60px', 
-              height: '60px', 
-              borderRadius: '50%', 
-              background: 'linear-gradient(135deg, #667eea, #764ba2)',
-              color: 'white',
+            <div style={{
+              background: 'rgba(0, 255, 136, 0.1)',
+              color: '#00ff88',
+              borderRadius: '50%',
+              width: '60px',
+              height: '60px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '1.5rem',
               fontWeight: 'bold',
               margin: '0 auto 1rem'
-            }}>
-              3
-            </div>
-            <h4 style={{ marginBottom: '0.5rem' }}>Collect RSVPs</h4>
-            <p style={{ fontSize: '0.9rem', color: '#666' }}>
-              Guests respond with "Yeah" or "Nah" and vote for awards
-            </p>
+            }}>3</div>
+            <h4 style={{ marginBottom: '0.5rem' }}>Track Results</h4>
+            <p style={{ fontSize: '0.9rem', color: '#888' }}>Monitor responses and award voting in real-time</p>
           </div>
+        </div>
+      </div>
+
+      {/* Key Features */}
+      <div className="grid grid-3" style={{ marginBottom: '4rem' }}>
+        <div className="card text-center">
+          <Users size={32} className="text-green" style={{ margin: '0 auto 1rem' }} />
+          <h4 style={{ marginBottom: '0.5rem' }}>Easy Guest Management</h4>
+          <p style={{ fontSize: '0.9rem', color: '#888' }}>Add guests with optional IDs for quick access</p>
+        </div>
+        <div className="card text-center">
+          <Award size={32} className="text-green" style={{ margin: '0 auto 1rem' }} />
+          <h4 style={{ marginBottom: '0.5rem' }}>Award Voting</h4>
+          <p style={{ fontSize: '0.9rem', color: '#888' }}>Create custom awards and let guests vote</p>
+        </div>
+        <div className="card text-center">
+          <Globe size={32} className="text-green" style={{ margin: '0 auto 1rem' }} />
+          <h4 style={{ marginBottom: '0.5rem' }}>Real-time Results</h4>
+          <p style={{ fontSize: '0.9rem', color: '#888' }}>See top performers instantly</p>
         </div>
       </div>
     </div>

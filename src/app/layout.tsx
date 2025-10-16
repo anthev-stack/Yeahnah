@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 import { EventProvider } from '@/context/EventContext'
 import { AuthProvider } from '@/components/AuthProvider'
 
@@ -24,6 +25,7 @@ export default function RootLayout({
               <main className="main-content">
                 {children}
               </main>
+              <Footer />
             </div>
           </EventProvider>
         </AuthProvider>

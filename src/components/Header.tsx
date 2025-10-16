@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { Calendar, Users, LogIn, LogOut, UserPlus } from 'lucide-react';
+import { Calendar, Users, LogIn, LogOut, UserPlus, ChevronDown } from 'lucide-react';
 
 const Header: React.FC = () => {
   const { data: session, status } = useSession();
@@ -12,54 +12,79 @@ const Header: React.FC = () => {
     <header className="header">
       <div className="header-content">
         <Link href="/" className="logo">
-          <Calendar size={24} style={{ marginRight: '8px', display: 'inline' }} />
+          <Calendar size={20} />
           Yeahnah
         </Link>
+        
         <nav>
           <ul className="nav-links">
             <li>
-              <Link href="/">Home</Link>
+              <Link href="/">
+                Home
+                <ChevronDown size={12} className="dropdown-arrow" />
+              </Link>
             </li>
-            {session ? (
-              <>
-                <li>
-                  <Link href="/create-event">
-                    <Users size={16} style={{ marginRight: '4px', display: 'inline' }} />
-                    Create Event
-                  </Link>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">
-                    Hello, {session.user?.name}
-                  </span>
-                  <button
-                    onClick={() => signOut()}
-                    className="btn btn-secondary"
-                    style={{ padding: '0.5rem' }}
-                  >
-                    <LogOut size={16} />
-                    Sign Out
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                <li>
-                  <Link href="/auth/signin" className="flex items-center gap-1">
-                    <LogIn size={16} />
-                    Sign In
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/auth/signup" className="flex items-center gap-1">
-                    <UserPlus size={16} />
-                    Sign Up
-                  </Link>
-                </li>
-              </>
+            <li>
+              <Link href="/features">
+                Features
+                <ChevronDown size={12} className="dropdown-arrow" />
+              </Link>
+            </li>
+            <li>
+              <Link href="/pricing">
+                Pricing
+                <ChevronDown size={12} className="dropdown-arrow" />
+              </Link>
+            </li>
+            <li>
+              <Link href="/docs">
+                Docs
+                <ChevronDown size={12} className="dropdown-arrow" />
+              </Link>
+            </li>
+            {session && (
+              <li>
+                <Link href="/create-event">
+                  <Users size={16} />
+                  Create Event
+                </Link>
+              </li>
             )}
           </ul>
         </nav>
+
+        <div className="nav-actions">
+          <Link href="/contact" className="btn-contact">
+            Contact
+          </Link>
+          {session ? (
+            <div className="flex items-center gap-2">
+              <Link href="/dashboard" className="btn-dashboard">
+                Dashboard
+              </Link>
+              <div className="profile-icon">
+                {session.user?.name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <button
+                onClick={() => signOut()}
+                className="text-gray-400 hover:text-white"
+                style={{ padding: '0.25rem' }}
+                title="Sign Out"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/auth/signin" className="text-white hover:text-gray-300">
+                Sign In
+              </Link>
+              <Link href="/auth/signup" className="btn-dashboard">
+                Get Started
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
