@@ -1,8 +1,8 @@
-# Yeahnah - RSVP Management Platform
+# Yeahnah - RSVP Management Platform (Next.js)
 
-Yeahnah is a comprehensive RSVP management platform designed to streamline event planning for both personal and business events. The platform features a modern, intuitive interface with advanced functionality including multi-store support, award voting systems, and detailed analytics.
+Yeahnah is a comprehensive RSVP management platform built with **Next.js** and designed to streamline event planning for both personal and business events. The platform features a modern, intuitive interface with advanced functionality including multi-store support, award voting systems, and detailed analytics.
 
-## Features
+## 🚀 Features
 
 ### 🎯 Core Functionality
 - **Dual Event Types**: Support for both Business and Personal events
@@ -28,60 +28,73 @@ Yeahnah is a comprehensive RSVP management platform designed to streamline event
 - **Intuitive Navigation**: Clean, organized interface with clear visual hierarchy
 - **Accessibility**: Keyboard navigation and screen reader friendly
 
-## Technology Stack
+## 🏗️ Technology Stack
 
-### Backend
-- **Node.js** with Express.js
-- **SQLite** database for data persistence
-- **RESTful API** architecture
-- **UUID** for unique identifier generation
-
-### Frontend
-- **React 18** with TypeScript
-- **React Router** for navigation
-- **Axios** for API communication
+### Full-Stack Next.js Application
+- **Next.js 15** with App Router
+- **React 19** with TypeScript
+- **SQLite** database (in-memory for demo)
+- **Tailwind CSS** for styling
 - **Lucide React** for modern icons
-- **CSS3** with modern features (Grid, Flexbox, Gradients)
+- **API Routes** for backend functionality
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v14 or higher)
+- Node.js (v18 or higher)
 - npm or yarn package manager
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd yeahnah-rsvp
+   git clone https://github.com/anthev-stack/Yeahnah.git
+   cd Yeahnah
    ```
 
 2. **Install dependencies**
    ```bash
-   npm run install-all
+   npm install
    ```
 
-3. **Start the development servers**
+3. **Start the development server**
    ```bash
    npm run dev
    ```
 
-   This will start both the backend server (port 5000) and frontend development server (port 3000).
+4. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-### Alternative Setup
+## 📁 Project Structure
 
-If you prefer to run the servers separately:
-
-```bash
-# Terminal 1 - Backend
-npm run server
-
-# Terminal 2 - Frontend
-npm run client
+```
+yeahnah-rsvp/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/               # API Routes
+│   │   │   ├── events/        # Event management endpoints
+│   │   │   ├── rsvp/          # RSVP endpoints
+│   │   │   └── ...
+│   │   ├── create-event/      # Event creation page
+│   │   ├── event/[eventId]/   # Event dashboard pages
+│   │   ├── rsvp/[guestId]/    # Guest RSVP pages
+│   │   ├── layout.tsx         # Root layout
+│   │   ├── page.tsx           # Home page
+│   │   └── globals.css        # Global styles
+│   ├── components/            # Reusable components
+│   │   └── Header.tsx
+│   ├── context/               # React context providers
+│   │   └── EventContext.tsx
+│   └── lib/                   # Utility functions
+│       └── database.ts        # Database configuration
+├── package.json
+├── next.config.js
+├── tsconfig.json
+├── vercel.json               # Vercel deployment config
+└── README.md
 ```
 
-## Usage Guide
+## 🎯 Usage Guide
 
 ### Creating an Event
 
@@ -111,25 +124,25 @@ npm run client
 4. **Vote for Awards**: If enabled, vote for colleagues and friends
 5. **View Results**: See voting results and event updates
 
-## API Endpoints
+## 🔌 API Endpoints
 
 ### Events
 - `POST /api/events` - Create new event
-- `GET /api/events/:eventId` - Get event details
-- `GET /api/events/:eventId/guests` - Get event guests
-- `GET /api/events/:eventId/awards` - Get event awards
-- `GET /api/events/:eventId/results` - Get voting results
+- `GET /api/events?eventId={id}` - Get event details
+- `GET /api/events/{eventId}/guests` - Get event guests
+- `GET /api/events/{eventId}/awards` - Get event awards
+- `GET /api/events/{eventId}/results` - Get voting results
 
 ### Guests
-- `POST /api/events/:eventId/guests` - Add guest to event
-- `GET /api/rsvp/:guestId` - Get guest RSVP status
-- `POST /api/rsvp/:guestId` - Submit RSVP response
+- `POST /api/events/{eventId}/guests` - Add guest to event
+- `GET /api/rsvp/{guestId}` - Get guest RSVP status
+- `POST /api/rsvp/{guestId}` - Submit RSVP response
 
 ### Awards & Voting
-- `POST /api/events/:eventId/awards` - Create award
-- `POST /api/events/:eventId/vote` - Submit vote
+- `POST /api/events/{eventId}/awards` - Create award
+- `POST /api/events/{eventId}/vote` - Submit vote
 
-## Database Schema
+## 🗄️ Database Schema
 
 ### Events Table
 - Event details, type, host information
@@ -148,7 +161,37 @@ npm run client
 - Voting records with voter and nominee tracking
 - Timestamp and award association
 
-## Contributing
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. **Connect your GitHub repository** to Vercel
+2. **Vercel will auto-detect** this as a Next.js application
+3. **Deploy!** - The app will be live in minutes
+
+### Other Platforms
+
+The application can also be deployed to:
+- **Netlify** (with serverless functions)
+- **Railway**
+- **Render**
+- **DigitalOcean App Platform**
+
+## ⚠️ Production Considerations
+
+### Current Setup (Demo)
+- ✅ **Perfect for testing and demos**
+- ❌ **In-memory database** (data lost on restart)
+- 🔄 **Suitable for development and prototyping**
+
+### For Production Use
+1. **Replace SQLite** with a persistent database (PostgreSQL, MongoDB)
+2. **Add authentication** (NextAuth.js recommended)
+3. **Implement input validation** and security measures
+4. **Add error monitoring** and logging
+5. **Set up proper CI/CD** pipeline
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -156,14 +199,16 @@ npm run client
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Support
+## 🆘 Support
 
 For support, email support@yeahnah.com or create an issue in the repository.
 
 ---
 
-Built with ❤️ for seamless event management
+**Built with Next.js** for modern, full-stack web development ❤️
+
+**Ready for deployment on Vercel** - Connect your GitHub repo and deploy in minutes!

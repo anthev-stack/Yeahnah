@@ -2,27 +2,40 @@
   "name": "yeahnah-rsvp",
   "version": "1.0.0",
   "description": "RSVP management platform for personal and business events",
-  "main": "server/index.js",
+  "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "nodemon server/index.js",
-    "client": "cd client && npm start",
-    "build": "cd client && npm run build",
-    "install-all": "npm install && cd client && npm install"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "keywords": ["rsvp", "events", "management"],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
+    "next": "^15.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "sqlite3": "^5.1.6",
-    "uuid": "^9.0.0",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2"
+    "uuid": "^9.0.1",
+    "axios": "^1.7.7",
+    "lucide-react": "^0.468.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
-    "concurrently": "^8.2.0"
-  }
+    "typescript": "^5.6.3",
+    "@types/react": "^19.0.2",
+    "@types/node": "^22.10.2",
+    "@types/react-dom": "^19.0.2",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^15.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anthev-stack/Yeahnah.git"
+  },
+  "bugs": {
+    "url": "https://github.com/anthev-stack/Yeahnah/issues"
+  },
+  "homepage": "https://github.com/anthev-stack/Yeahnah#readme"
 }
