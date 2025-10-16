@@ -5,18 +5,22 @@ export async function POST(request: NextRequest) {
   try {
     await initializeDatabase();
     
-    const { title, description, eventType, multiStoreEnabled, hostName, hostEmail, hostId } = await request.json();
+    const { title, description, eventType, multiStoreEnabled, eventDate, hostName, hostEmail, hostId } = await request.json();
     
     if (!hostId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    if (!eventDate) {
+      return NextResponse.json({ error: 'Event date is required' }, { status: 400 });
     }
     
     const eventId = uuidv4();
     
     await dbRun(
-      `INSERT INTO events (id, title, description, event_type, multi_store_enabled, host_id, host_name, host_email) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [eventId, title, description, eventType, multiStoreEnabled ? 1 : 0, hostId, hostName, hostEmail]
+      `INSERT INTO events (id, title, description, event_type, multi_store_enabled, event_date, host_id, host_name, host_email) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [eventId, title, description, eventType, multiStoreEnabled ? 1 : 0, eventDate, hostId, hostName, hostEmail]
     );
     
     return NextResponse.json({ eventId, message: 'Event created successfully' });

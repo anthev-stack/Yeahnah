@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "init-db": "node scripts/init-db.js"
+    "init-db": "node scripts/init-db.js",
+    "test-cleanup": "node scripts/test-cleanup.js"
   },
   "keywords": [
     "rsvp",

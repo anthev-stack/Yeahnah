@@ -66,6 +66,10 @@ Yeahnah is a comprehensive RSVP management platform built with **Next.js** and d
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=your-secret-key-here
    DATABASE_URL=your_postgresql_connection_string
+   
+   # Email configuration (optional - for event summaries)
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-app-password
    ```
 
 4. **Initialize the database (Required for first run)**
@@ -80,6 +84,22 @@ Yeahnah is a comprehensive RSVP management platform built with **Next.js** and d
 
 6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+### 📧 Email Notifications
+
+The platform automatically sends event summary emails to hosts after events complete. To enable this feature:
+
+1. Set up SMTP credentials in your `.env.local` file
+2. The system will automatically cleanup expired events and send summaries
+3. Test the cleanup functionality: `npm run test-cleanup`
+
+### 🧹 Automatic Cleanup
+
+Events are automatically cleaned up after their date passes:
+- Hosts receive detailed event summary emails
+- Event data is archived and removed from the database
+- Frees up space for new events
+- Maintains database performance
 
 ## 📁 Project Structure
 

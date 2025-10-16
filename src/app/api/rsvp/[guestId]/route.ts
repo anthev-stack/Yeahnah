@@ -10,7 +10,7 @@ export async function GET(
     
     const resolvedParams = await params;
     const guest = await dbGet(
-      `SELECT g.*, e.title as event_title, e.event_type, e.multi_store_enabled 
+      `SELECT g.*, e.title as event_title, e.event_type, e.multi_store_enabled, e.event_date 
        FROM guests g 
        JOIN events e ON g.event_id = e.id 
        WHERE g.guest_id = ?`,

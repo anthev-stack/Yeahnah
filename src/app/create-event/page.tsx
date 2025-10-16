@@ -42,6 +42,7 @@ export default function CreateEventPage() {
     description: '',
     eventType: 'personal' as 'business' | 'personal',
     multiStoreEnabled: false,
+    eventDate: '',
     hostName: '',
     hostEmail: '',
     awardsEnabled: false,
@@ -117,8 +118,8 @@ export default function CreateEventPage() {
   };
 
   const createEvent = async () => {
-    if (!eventData.title || !eventData.hostName || !eventData.hostEmail) {
-      alert('Please fill in all required fields');
+    if (!eventData.title || !eventData.eventDate || !eventData.hostName || !eventData.hostEmail) {
+      alert('Please fill in all required fields including event date');
       return;
     }
 
@@ -350,6 +351,20 @@ export default function CreateEventPage() {
               )}
             </div>
           )}
+
+          <div className="form-group">
+            <label className="form-label">Event Date *</label>
+            <input
+              type="date"
+              className="form-input"
+              value={eventData.eventDate}
+              onChange={(e) => handleEventDataChange('eventDate', e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+            />
+            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.5rem' }}>
+              This date will be visible to all invited guests
+            </p>
+          </div>
 
           <div className="form-group">
             <label className="form-label">Host Name *</label>

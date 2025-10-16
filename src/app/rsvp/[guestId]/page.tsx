@@ -17,6 +17,7 @@ interface GuestData {
   event_title: string;
   event_type: 'business' | 'personal';
   multi_store_enabled: boolean;
+  event_date: string;
 }
 
 interface AwardData {
@@ -153,6 +154,23 @@ export default function RSVPPage() {
       <div className="card-header text-center">
         <Calendar size={48} color="#667eea" style={{ marginBottom: '1rem' }} />
         <h1 className="card-title">{guest.event_title}</h1>
+        <div style={{ 
+          background: 'rgba(0, 255, 136, 0.1)', 
+          color: '#00ff88', 
+          padding: '0.5rem 1rem', 
+          borderRadius: '20px', 
+          display: 'inline-block',
+          marginBottom: '1rem',
+          fontSize: '0.9rem',
+          fontWeight: '500'
+        }}>
+          📅 {new Date(guest.event_date).toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+        </div>
         <p className="card-subtitle">
           Hi {guest.first_name} {guest.last_name}!
         </p>
