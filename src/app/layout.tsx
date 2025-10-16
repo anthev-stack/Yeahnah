@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
 import { EventProvider } from '@/context/EventContext'
+import { AuthProvider } from '@/components/AuthProvider'
 
 export const metadata: Metadata = {
   title: 'Yeahnah - RSVP Management Platform',
@@ -16,14 +17,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <EventProvider>
-          <div className="App">
-            <Header />
-            <main className="main-content">
-              {children}
-            </main>
-          </div>
-        </EventProvider>
+        <AuthProvider>
+          <EventProvider>
+            <div className="App">
+              <Header />
+              <main className="main-content">
+                {children}
+              </main>
+            </div>
+          </EventProvider>
+        </AuthProvider>
       </body>
     </html>
   )

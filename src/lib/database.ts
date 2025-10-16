@@ -9,6 +9,17 @@ const db = new sqlite3.Database(':memory:');
 export const initializeDatabase = () => {
   return new Promise<void>((resolve, reject) => {
     db.serialize(() => {
+      // Users table
+      db.run(`CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        name TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`, (err) => {
+        if (err) reject(err);
+      });
+
       // Events table
       db.run(`CREATE TABLE IF NOT EXISTS events (
         id TEXT PRIMARY KEY,
@@ -17,8 +28,10 @@ export const initializeDatabase = () => {
         event_type TEXT NOT NULL CHECK (event_type IN ('business', 'personal')),
         multi_store_enabled BOOLEAN DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        host_id TEXT NOT NULL,
         host_name TEXT,
-        host_email TEXT
+        host_email TEXT,
+        FOREIGN KEY (host_id) REFERENCES users (id)
       )`, (err) => {
         if (err) reject(err);
       });

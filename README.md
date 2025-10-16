@@ -5,10 +5,12 @@ Yeahnah is a comprehensive RSVP management platform built with **Next.js** and d
 ## 🚀 Features
 
 ### 🎯 Core Functionality
+- **User Authentication**: Secure sign-up and sign-in system for event creators
 - **Dual Event Types**: Support for both Business and Personal events
 - **Simple RSVP System**: Guests respond with "Yeah" (Yes) or "Nah" (No)
 - **Unique Guest IDs**: Optional guest IDs for easy RSVP access via custom links
 - **Multi-Store Support**: Business events can organize guests by stores/departments
+- **Public RSVP**: Guests can RSVP without creating accounts
 
 ### 🏆 Award Voting System
 - **Custom Awards**: Create your own award categories
@@ -33,6 +35,7 @@ Yeahnah is a comprehensive RSVP management platform built with **Next.js** and d
 ### Full-Stack Next.js Application
 - **Next.js 15** with App Router
 - **React 19** with TypeScript
+- **NextAuth.js** for authentication
 - **SQLite** database (in-memory for demo)
 - **Tailwind CSS** for styling
 - **Lucide React** for modern icons
@@ -57,12 +60,19 @@ Yeahnah is a comprehensive RSVP management platform built with **Next.js** and d
    npm install
    ```
 
-3. **Start the development server**
+3. **Set up environment variables (Optional)**
+   Create a `.env.local` file in the root directory:
+   ```bash
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=your-secret-key-here
+   ```
+
+4. **Start the development server**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
+5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 📁 Project Structure

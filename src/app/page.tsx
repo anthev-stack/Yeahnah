@@ -2,9 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Calendar, Users, Award, Building2, Heart } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { Calendar, Users, Award, Building2, Heart, LogIn } from 'lucide-react';
 
 export default function HomePage() {
+  const { data: session } = useSession();
+
   return (
     <div className="text-center">
       <div className="card">
@@ -15,6 +18,11 @@ export default function HomePage() {
           <p className="card-subtitle" style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
             Streamline your RSVP management for both personal and business events
           </p>
+          {session && (
+            <p className="text-green-600 font-medium" style={{ fontSize: '1rem', marginBottom: '1rem' }}>
+              Welcome back, {session.user?.name}! Ready to create your next event?
+            </p>
+          )}
         </div>
 
         <div className="grid grid-2" style={{ marginBottom: '3rem' }}>
@@ -70,10 +78,17 @@ export default function HomePage() {
         </div>
 
         <div className="flex justify-center gap-4">
-          <Link href="/create-event" className="btn btn-primary btn-large">
-            <Calendar size={20} />
-            Create Your First Event
-          </Link>
+          {session ? (
+            <Link href="/create-event" className="btn btn-primary btn-large">
+              <Calendar size={20} />
+              Create New Event
+            </Link>
+          ) : (
+            <Link href="/auth/signup" className="btn btn-primary btn-large">
+              <LogIn size={20} />
+              Get Started - Sign Up
+            </Link>
+          )}
         </div>
       </div>
 

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Building2, Heart, Plus, Users, Award } from 'lucide-react';
 
 interface Guest {
@@ -21,8 +22,15 @@ interface Award {
 
 export default function CreateEventPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  // Redirect if not authenticated
+  if (!session) {
+    router.push('/auth/signin');
+    return null;
+  }
 
   // Event form data
   const [eventData, setEventData] = useState({
@@ -99,7 +107,12 @@ export default function CreateEventPage() {
       const eventResponse = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(eventData)
+        body: JSON.stringify({
+          ...eventData,
+          hostId: session.user.id,
+          hostName: session.user.name,
+          hostEmail: session.user.email
+        })
       });
       const eventResult = await eventResponse.json();
       const newEventId = eventResult.eventId;
