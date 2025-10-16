@@ -10,6 +10,7 @@
     "lint": "next lint",
     "init-db": "node scripts/init-db.js",
     "migrate-db": "node scripts/migrate-db.js",
+    "fix-guest-constraint": "node scripts/fix-guest-id-constraint.js",
     "test-cleanup": "node scripts/test-cleanup.js"
   },
   "keywords": [
@@ -35,7 +36,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sqlite3": "^5.1.6",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

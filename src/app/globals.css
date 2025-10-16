@@ -715,6 +715,122 @@ body::before {
   background: rgba(0, 0, 0, 0.9);
 }
 
+/* Excel Upload styles */
+.excel-upload-section {
+  margin-bottom: 2rem;
+}
+
+.excel-upload-header {
+  margin-bottom: 1rem;
+}
+
+.excel-upload-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: rgb(var(--foreground-rgb));
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.excel-upload-description {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.excel-upload-area {
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--card-background);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.excel-upload-area:hover {
+  border-color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.05);
+}
+
+.excel-upload-area.dragging {
+  border-color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.excel-upload-area.uploading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.excel-upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-note {
+  font-size: 0.8rem;
+  color: var(--accent-green);
+  margin: 0.5rem 0 0 0;
+  font-weight: 500;
+}
+
+.excel-upload-help {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.excel-upload-help h5 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  color: rgb(var(--foreground-rgb));
+}
+
+.excel-format-example {
+  margin: 0.75rem 0;
+}
+
+.excel-format-example table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.excel-format-example th,
+.excel-format-example td {
+  border: 1px solid var(--border-color);
+  padding: 0.5rem;
+  text-align: left;
+  background: var(--card-background);
+}
+
+.excel-format-example th {
+  background: rgba(0, 255, 136, 0.1);
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+.help-note {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 0.75rem 0 0 0;
+  line-height: 1.4;
+}
+
 /* Text Colors */
 .text-white { color: #ffffff; }
 .text-gray { color: #888; }
