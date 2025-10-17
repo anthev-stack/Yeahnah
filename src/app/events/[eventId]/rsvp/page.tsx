@@ -155,12 +155,17 @@ export default function EventRSVPPage() {
   if (loading) {
     return (
       <div style={{ 
-        minHeight: '100vh', 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        fontFamily: 'system-ui, -apple-system, sans-serif'
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        zIndex: 10000
       }}>
         <div style={{
           background: 'rgba(255, 255, 255, 0.95)',
@@ -195,12 +200,17 @@ export default function EventRSVPPage() {
   if (!event) {
     return (
       <div style={{ 
-        minHeight: '100vh', 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
         background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
-        fontFamily: 'system-ui, -apple-system, sans-serif'
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        zIndex: 10000
       }}>
         <div style={{
           background: 'rgba(255, 255, 255, 0.95)',
@@ -260,13 +270,19 @@ export default function EventRSVPPage() {
 
     return (
       <div style={{ 
-        minHeight: '100vh', 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
         background: styles.background,
         fontFamily: 'system-ui, -apple-system, sans-serif',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem 1rem'
+        padding: '2rem 1rem',
+        zIndex: 10000,
+        overflow: 'auto'
       }}>
         <div style={{
           background: styles.cardBg,
