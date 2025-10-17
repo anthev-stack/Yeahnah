@@ -57,3 +57,11 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to update RSVP' }, { status: 500 });
   }
 }
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ guestId: string }> }
+) {
+  // PUT method does the same thing as POST for RSVP updates
+  return POST(request, { params });
+}

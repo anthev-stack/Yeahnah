@@ -143,17 +143,8 @@ export default function EventDashboardPage() {
     return filtered.sort((a, b) => b.vote_count - a.vote_count);
   };
 
-  const generateShareLinks = () => {
-    if (!guests || !Array.isArray(guests)) return [];
-    const shareLinks = guests
-      .filter(g => g.guest_id)
-      .map(g => ({
-        guest: `${g.first_name} ${g.last_name}`,
-        link: `${window.location.origin}/rsvp/${g.guest_id}`,
-        guestId: g.guest_id
-      }));
-    
-    return shareLinks;
+  const getEventInviteLink = () => {
+    return `${window.location.origin}/events/${eventId}/rsvp`;
   };
 
   const copyToClipboard = async (text: string, guestId?: string) => {
@@ -185,13 +176,6 @@ export default function EventDashboardPage() {
     }
   };
 
-  const copyAllLinks = () => {
-    const shareLinks = generateShareLinks();
-    const allLinksText = shareLinks
-      .map(link => `${link.guest}: ${link.link}`)
-      .join('\n');
-    copyToClipboard(allLinksText);
-  };
 
   const exportToCSV = () => {
     const csvData = guests.map(g => ({
@@ -239,7 +223,6 @@ export default function EventDashboardPage() {
   const stats = getRSVPStats();
   const filteredGuests = getFilteredGuests();
   const filteredResults = getFilteredResults();
-  const shareLinks = generateShareLinks();
 
   return (
     <div>
@@ -363,87 +346,73 @@ export default function EventDashboardPage() {
             ))}
           </div>
 
-          {shareLinks.length > 0 && (
-            <div style={{ marginTop: '2rem' }}>
-              <div className="flex justify-between items-center mb-4">
-                <h4 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Link2 size={20} />
-                  Guest Invite Links
-                </h4>
-                <div className="flex gap-2">
-                  <button
-                    className={`btn ${bulkCopied ? 'btn-success' : 'btn-secondary'}`}
-                    onClick={copyAllLinks}
-                    style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
-                  >
-                    {bulkCopied ? (
-                      <>
-                        <Check size={16} style={{ marginRight: '0.5rem' }} />
-                        Copied All!
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={16} style={{ marginRight: '0.5rem' }} />
-                        Copy All Links
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-              
-              <div className="list">
-                {shareLinks.map((link, index) => {
-                  const isCopied = copiedLinks.has(link.guestId!);
-                  return (
-                    <div key={index} className="list-item">
-                      <div className="flex justify-between items-center">
-                        <div className="flex flex-col">
-                          <span style={{ fontWeight: '500' }}>{link.guest}</span>
-                          <span style={{ fontSize: '0.8rem', color: '#888' }}>
-                            Guest ID: {link.guestId}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={link.link}
-                            readOnly
-                            className="form-input"
-                            style={{ width: '350px', fontSize: '0.8rem' }}
-                            onClick={(e) => (e.target as HTMLInputElement).select()}
-                          />
-                          <button
-                            className={`btn ${isCopied ? 'btn-success' : 'btn-secondary'}`}
-                            onClick={() => copyToClipboard(link.link, link.guestId)}
-                            style={{ padding: '0.5rem', minWidth: '40px' }}
-                            title={isCopied ? 'Copied!' : 'Copy link'}
-                          >
-                            {isCopied ? (
-                              <Check size={14} />
-                            ) : (
-                              <Copy size={14} />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(0, 255, 136, 0.1)', borderRadius: '8px', border: '1px solid rgba(0, 255, 136, 0.3)' }}>
-                <h5 style={{ margin: '0 0 0.5rem 0', color: 'var(--accent-green)' }}>
-                  💡 Pro Tips:
-                </h5>
-                <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
-                  <li>Click on any link to select it for manual copying</li>
-                  <li>Use "Copy All Links" to get all links in a formatted list</li>
-                  <li>Share individual links via email, text, or social media</li>
-                  <li>Guests can RSVP without creating an account</li>
-                </ul>
+          <div style={{ marginTop: '2rem' }}>
+            <div className="flex justify-between items-center mb-4">
+              <h4 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Link2 size={20} />
+                Event Invite Link
+              </h4>
+              <div className="flex gap-2">
+                <button
+                  className={`btn ${bulkCopied ? 'btn-success' : 'btn-secondary'}`}
+                  onClick={() => copyToClipboard(getEventInviteLink())}
+                  style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+                >
+                  {bulkCopied ? (
+                    <>
+                      <Check size={16} style={{ marginRight: '0.5rem' }} />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={16} style={{ marginRight: '0.5rem' }} />
+                      Copy Link
+                    </>
+                  )}
+                </button>
               </div>
             </div>
-          )}
+            
+            <div className="card" style={{ padding: '1.5rem' }}>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={getEventInviteLink()}
+                    readOnly
+                    className="form-input"
+                    style={{ width: '100%', fontSize: '0.9rem' }}
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
+                  />
+                </div>
+                <button
+                  className={`btn ${bulkCopied ? 'btn-success' : 'btn-secondary'}`}
+                  onClick={() => copyToClipboard(getEventInviteLink())}
+                  style={{ padding: '0.75rem', minWidth: '50px' }}
+                  title={bulkCopied ? 'Copied!' : 'Copy link'}
+                >
+                  {bulkCopied ? (
+                    <Check size={16} />
+                  ) : (
+                    <Copy size={16} />
+                  )}
+                </button>
+              </div>
+            </div>
+            
+            <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(0, 255, 136, 0.1)', borderRadius: '8px', border: '1px solid rgba(0, 255, 136, 0.3)' }}>
+              <h5 style={{ margin: '0 0 0.5rem 0', color: 'var(--accent-green)' }}>
+                💡 How It Works:
+              </h5>
+              <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
+                <li>Share this single link with all your guests</li>
+                <li>Guests enter their name or guest ID to find their invitation</li>
+                <li>No need to manage individual links for each guest</li>
+                <li>Guests can RSVP without creating an account</li>
+                <li>Perfect for email blasts, social media, or QR codes</li>
+              </ul>
+            </div>
+          </div>
         </div>
       )}
 
