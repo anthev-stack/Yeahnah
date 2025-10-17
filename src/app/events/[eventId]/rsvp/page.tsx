@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Check, X, Award, Calendar, Users, Search } from 'lucide-react';
-import TemplateRSVP from '@/components/TemplateRSVP';
+import StandaloneRSVP from '@/components/StandaloneRSVP';
 
 interface EventData {
   id: string;
@@ -154,96 +154,266 @@ export default function EventRSVPPage() {
 
   if (loading) {
     return (
-      <div className="card text-center">
-        <div className="spinner" style={{ margin: '2rem auto' }}></div>
-        <p>Loading event...</p>
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '3rem',
+          borderRadius: '20px',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+          textAlign: 'center',
+          maxWidth: '400px',
+          width: '90%'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #667eea',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem'
+          }}></div>
+          <p style={{ margin: 0, color: '#666', fontSize: '1.1rem' }}>Loading event...</p>
+        </div>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
 
   if (!event) {
     return (
-      <div className="card text-center">
-        <X size={48} color="#ff416c" style={{ marginBottom: '1rem' }} />
-        <h2 style={{ marginBottom: '1rem' }}>Event Not Found</h2>
-        <p>The event you're looking for doesn't exist or has been removed.</p>
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '3rem',
+          borderRadius: '20px',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+          textAlign: 'center',
+          maxWidth: '400px',
+          width: '90%'
+        }}>
+          <X size={48} color="#ff6b6b" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ marginBottom: '1rem', color: '#333' }}>Event Not Found</h2>
+          <p style={{ color: '#666', lineHeight: '1.5' }}>The event you're looking for doesn't exist or has been removed.</p>
+        </div>
       </div>
     );
   }
 
   if (!selectedGuest) {
+    const getThemeStyles = (theme: 'light' | 'dark' | 'love') => {
+      switch (theme) {
+        case 'dark':
+          return {
+            background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
+            cardBg: 'rgba(26, 26, 26, 0.95)',
+            textColor: '#ffffff',
+            inputBg: '#333333',
+            inputBorder: '#00ff88',
+            buttonBg: '#00ff88',
+            buttonColor: '#000000'
+          };
+        case 'love':
+          return {
+            background: 'linear-gradient(135deg, #ffe4e1 0%, #fff0f5 100%)',
+            cardBg: 'rgba(255, 240, 245, 0.95)',
+            textColor: '#8b4b69',
+            inputBg: '#ffffff',
+            inputBorder: '#ff69b4',
+            buttonBg: '#ff69b4',
+            buttonColor: '#ffffff'
+          };
+        case 'light':
+        default:
+          return {
+            background: 'linear-gradient(135deg, #e0e7ff 0%, #ffffff 100%)',
+            cardBg: 'rgba(255, 255, 255, 0.95)',
+            textColor: '#333333',
+            inputBg: '#ffffff',
+            inputBorder: '#667eea',
+            buttonBg: '#667eea',
+            buttonColor: '#ffffff'
+          };
+      }
+    };
+
+    const styles = getThemeStyles(event.template_theme);
+
     return (
-      <div className="rsvp-container">
-        <div className="rsvp-card">
+      <div style={{ 
+        minHeight: '100vh', 
+        background: styles.background,
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem 1rem'
+      }}>
+        <div style={{
+          background: styles.cardBg,
+          padding: '3rem',
+          borderRadius: '20px',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+          textAlign: 'center',
+          maxWidth: '500px',
+          width: '100%',
+          color: styles.textColor
+        }}>
           {event.logo_url && (
-            <div className="logo-display">
-              <img src={event.logo_url} alt="Event Logo" className="event-logo" />
+            <div style={{ marginBottom: '2rem' }}>
+              <img 
+                src={event.logo_url} 
+                alt="Event Logo" 
+                style={{ 
+                  maxWidth: '120px', 
+                  maxHeight: '120px', 
+                  objectFit: 'contain',
+                  borderRadius: '10px'
+                }} 
+              />
             </div>
           )}
           
-          <div className="card-header text-center">
-            <Calendar size={48} style={{ marginBottom: '1rem' }} />
-            <h1 className="card-title">{event.title}</h1>
-            <div className="event-date-display">
-              📅 {new Date(event.event_date).toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </div>
-            <p className="card-subtitle">
-              Please enter your information to RSVP
-            </p>
+          <Calendar size={48} style={{ marginBottom: '1rem', color: styles.buttonBg }} />
+          <h1 style={{ 
+            fontSize: '2rem', 
+            fontWeight: 'bold', 
+            marginBottom: '0.5rem',
+            color: styles.textColor
+          }}>
+            {event.title}
+          </h1>
+          
+          <div style={{ 
+            fontSize: '1.1rem', 
+            marginBottom: '1rem',
+            color: styles.textColor,
+            opacity: 0.8
+          }}>
+            📅 {new Date(event.event_date).toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
           </div>
+          
+          <p style={{ 
+            fontSize: '1rem', 
+            marginBottom: '2rem',
+            color: styles.textColor,
+            opacity: 0.7
+          }}>
+            Please enter your information to RSVP
+          </p>
 
-          <div className="rsvp-form">
-            <div className="form-group">
-              <label className="form-label">How would you like to find your invitation?</label>
-              <div className="flex gap-4 mb-4">
-                <label className="flex items-center">
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.75rem',
+                fontWeight: '600',
+                color: styles.textColor
+              }}>
+                How would you like to find your invitation?
+              </label>
+              <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                   <input
                     type="radio"
                     name="searchMethod"
                     value="name"
                     checked={searchMethod === 'name'}
                     onChange={(e) => setSearchMethod(e.target.value as 'name' | 'id')}
-                    className="mr-2"
+                    style={{ marginRight: '0.5rem' }}
                   />
-                  By Name
+                  <span style={{ color: styles.textColor }}>By Name</span>
                 </label>
-                <label className="flex items-center">
+                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                   <input
                     type="radio"
                     name="searchMethod"
                     value="id"
                     checked={searchMethod === 'id'}
                     onChange={(e) => setSearchMethod(e.target.value as 'name' | 'id')}
-                    className="mr-2"
+                    style={{ marginRight: '0.5rem' }}
                   />
-                  By Guest ID
+                  <span style={{ color: styles.textColor }}>By Guest ID</span>
                 </label>
               </div>
             </div>
 
             {searchMethod === 'name' ? (
               <>
-                <div className="form-group">
-                  <label className="form-label">First Name *</label>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem',
+                    fontWeight: '600',
+                    color: styles.textColor
+                  }}>
+                    First Name *
+                  </label>
                   <input
                     type="text"
-                    className="form-input"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: `2px solid ${styles.inputBorder}`,
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      background: styles.inputBg,
+                      color: styles.textColor,
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Enter your first name"
                     onKeyPress={(e) => e.key === 'Enter' && findGuest()}
                   />
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Last Name (Optional)</label>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem',
+                    fontWeight: '600',
+                    color: styles.textColor
+                  }}>
+                    Last Name (Optional)
+                  </label>
                   <input
                     type="text"
-                    className="form-input"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: `2px solid ${styles.inputBorder}`,
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      background: styles.inputBg,
+                      color: styles.textColor,
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Enter your last name"
@@ -252,11 +422,28 @@ export default function EventRSVPPage() {
                 </div>
               </>
             ) : (
-              <div className="form-group">
-                <label className="form-label">Guest ID *</label>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '0.5rem',
+                  fontWeight: '600',
+                  color: styles.textColor
+                }}>
+                  Guest ID *
+                </label>
                 <input
                   type="text"
-                  className="form-input"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: `2px solid ${styles.inputBorder}`,
+                    borderRadius: '8px',
+                    fontSize: '1rem',
+                    background: styles.inputBg,
+                    color: styles.textColor,
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
                   value={guestId}
                   onChange={(e) => setGuestId(e.target.value)}
                   placeholder="Enter your guest ID"
@@ -266,11 +453,33 @@ export default function EventRSVPPage() {
             )}
 
             <button
-              className="btn btn-primary btn-large"
               onClick={findGuest}
-              style={{ width: '100%', marginTop: '1rem' }}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                background: styles.buttonBg,
+                color: styles.buttonColor,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '1.1rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.opacity = '0.9';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
-              <Search size={20} style={{ marginRight: '0.5rem' }} />
+              <Search size={20} />
               Find My Invitation
             </button>
           </div>
@@ -281,7 +490,7 @@ export default function EventRSVPPage() {
 
   // Show RSVP form for the selected guest
   return (
-    <TemplateRSVP
+    <StandaloneRSVP
       guest={{
         id: selectedGuest.id,
         event_id: selectedGuest.event_id,

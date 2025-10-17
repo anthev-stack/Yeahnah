@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Building2, Heart, Plus, Users, Award } from 'lucide-react';
@@ -58,6 +58,18 @@ export default function CreateEventPage() {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [awards, setAwards] = useState<Award[]>([]);
   const [groupName, setGroupName] = useState('');
+  const [focusGuestId, setFocusGuestId] = useState<string | null>(null);
+
+  // Auto-focus newly created guest sections
+  useEffect(() => {
+    if (focusGuestId) {
+      const element = document.getElementById(`guest-firstname-${focusGuestId}`);
+      if (element) {
+        element.focus();
+        setFocusGuestId(null); // Reset after focusing
+      }
+    }
+  }, [focusGuestId]);
 
   const handleEventDataChange = (field: string, value: any) => {
     setEventData(prev => ({
@@ -91,6 +103,15 @@ export default function CreateEventPage() {
       groupId: groupId
     };
     setGuests([...guests, newGuest]);
+    setFocusGuestId(newGuest.id);
+    
+    // Scroll to the new guest section after a brief delay
+    setTimeout(() => {
+      const element = document.getElementById(`guest-${newGuest.id}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   };
 
   const updateGuest = (index: number, field: string, value: string) => {
@@ -438,9 +459,15 @@ export default function CreateEventPage() {
 
           {eventData.multiStoreEnabled && groups.length > 0 ? (
             <div>
-              <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+              <p style={{ marginBottom: '1rem', color: '#666' }}>
                 Add guests to each group. Click the "+" button in each column to add a new guest, or upload an Excel file.
               </p>
+              
+              <div style={{ marginBottom: '1.5rem', padding: '0.75rem', background: 'rgba(0, 255, 136, 0.1)', borderRadius: '6px', border: '1px solid rgba(0, 255, 136, 0.3)' }}>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>
+                  💡 <strong>Quick Tips:</strong> Press <kbd style={{ background: '#333', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '0.75rem' }}>Enter</kbd> in any field to add a new guest to that group. Use <kbd style={{ background: '#333', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '0.75rem' }}>Tab</kbd> to navigate between fields quickly.
+                </p>
+              </div>
               
               {/* Excel Upload for Multi-Group */}
               <div style={{ marginBottom: '2rem', padding: '1rem', border: '1px solid #e1e5e9', borderRadius: '8px', background: '#f8f9fa' }}>
@@ -491,10 +518,11 @@ export default function CreateEventPage() {
                           {groupGuests.map((guest, guestIndex) => {
                             const globalIndex = guests.findIndex(g => g.id === guest.id);
                             return (
-                              <div key={guest.id} className="p-2 bg-gray-50 rounded border">
+                              <div key={guest.id} id={`guest-${guest.id}`} className="p-2 bg-gray-50 rounded border">
                                 <div className="grid grid-1 gap-2">
                                   <input
                                     type="text"
+                                    id={`guest-firstname-${guest.id}`}
                                     className="form-input"
                                     style={{ padding: '0.5rem', fontSize: '0.9rem' }}
                                     value={guest.firstName}
@@ -506,9 +534,11 @@ export default function CreateEventPage() {
                                       }
                                     }}
                                     placeholder="First Name *"
+                                    tabIndex={1}
                                   />
                                   <input
                                     type="text"
+                                    id={`guest-lastname-${guest.id}`}
                                     className="form-input"
                                     style={{ padding: '0.5rem', fontSize: '0.9rem' }}
                                     value={guest.lastName}
@@ -520,9 +550,11 @@ export default function CreateEventPage() {
                                       }
                                     }}
                                     placeholder="Last Name (optional)"
+                                    tabIndex={2}
                                   />
                                   <input
                                     type="text"
+                                    id={`guest-guestid-${guest.id}`}
                                     className="form-input"
                                     style={{ padding: '0.5rem', fontSize: '0.9rem' }}
                                     value={guest.guestId}
@@ -534,6 +566,7 @@ export default function CreateEventPage() {
                                       }
                                     }}
                                     placeholder="Guest ID (optional)"
+                                    tabIndex={3}
                                   />
                                 </div>
                                 <button
@@ -586,9 +619,15 @@ export default function CreateEventPage() {
                   Add Guest
                 </button>
               </div>
+              
+              <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'rgba(0, 255, 136, 0.1)', borderRadius: '6px', border: '1px solid rgba(0, 255, 136, 0.3)' }}>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>
+                  💡 <strong>Quick Tips:</strong> Press <kbd style={{ background: '#333', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '0.75rem' }}>Enter</kbd> in any field to add a new guest. Use <kbd style={{ background: '#333', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '0.75rem' }}>Tab</kbd> to navigate between fields quickly.
+                </p>
+              </div>
 
               {guests.map((guest, index) => (
-                <div key={guest.id} className="card" style={{ marginBottom: '1rem' }}>
+                <div key={guest.id} id={`guest-${guest.id}`} className="card" style={{ marginBottom: '1rem' }}>
                   <div className="flex justify-between items-center mb-2">
                     <h4>Guest {index + 1}</h4>
                     <button 
@@ -605,6 +644,7 @@ export default function CreateEventPage() {
                       <label className="form-label">First Name *</label>
                       <input
                         type="text"
+                        id={`guest-firstname-${guest.id}`}
                         className="form-input"
                         value={guest.firstName}
                         onChange={(e) => updateGuest(index, 'firstName', e.target.value)}
@@ -615,12 +655,14 @@ export default function CreateEventPage() {
                           }
                         }}
                         placeholder="John"
+                        tabIndex={1}
                       />
                     </div>
                     <div>
                       <label className="form-label">Last Name (Optional)</label>
                       <input
                         type="text"
+                        id={`guest-lastname-${guest.id}`}
                         className="form-input"
                         value={guest.lastName}
                         onChange={(e) => updateGuest(index, 'lastName', e.target.value)}
@@ -631,12 +673,14 @@ export default function CreateEventPage() {
                           }
                         }}
                         placeholder="Doe"
+                        tabIndex={2}
                       />
                     </div>
                     <div>
                       <label className="form-label">Guest ID (Optional)</label>
                       <input
                         type="text"
+                        id={`guest-guestid-${guest.id}`}
                         className="form-input"
                         value={guest.guestId}
                         onChange={(e) => updateGuest(index, 'guestId', e.target.value)}
@@ -647,6 +691,7 @@ export default function CreateEventPage() {
                           }
                         }}
                         placeholder="Unique ID for easy RSVP access"
+                        tabIndex={3}
                       />
                     </div>
                   </div>
