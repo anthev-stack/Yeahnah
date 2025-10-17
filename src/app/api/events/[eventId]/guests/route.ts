@@ -12,10 +12,19 @@ export async function POST(
     const guestUuid = uuidv4();
     const resolvedParams = await params;
     
+    // Generate a unique guest_id if none provided or if it's empty
+    let finalGuestId = guestId;
+    if (!guestId || guestId.trim() === '') {
+      // Generate a unique guest_id based on first name and timestamp
+      const timestamp = Date.now().toString(36);
+      const firstNameInitial = firstName ? firstName.charAt(0).toUpperCase() : 'G';
+      finalGuestId = `${firstNameInitial}${timestamp}`;
+    }
+    
     await dbRun(
       `INSERT INTO guests (id, event_id, first_name, last_name, guest_id, group_id) 
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [guestUuid, resolvedParams.eventId, firstName, lastName, guestId, groupId]
+      [guestUuid, resolvedParams.eventId, firstName, lastName, finalGuestId, groupId]
     );
     
     return NextResponse.json({ guestId: guestUuid, message: 'Guest added successfully' });

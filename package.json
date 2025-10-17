@@ -11,6 +11,7 @@
     "init-db": "node scripts/init-db.js",
     "migrate-db": "node scripts/migrate-db.js",
     "fix-guest-constraint": "node scripts/fix-guest-id-constraint.js",
+    "fix-empty-guest-ids": "node scripts/fix-empty-guest-ids.js",
     "test-cleanup": "node scripts/test-cleanup.js"
   },
   "keywords": [
