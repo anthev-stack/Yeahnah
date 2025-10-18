@@ -32,9 +32,10 @@ interface StandaloneRSVPProps {
   onRSVP: (response: 'yes' | 'no') => void;
   onVote: (awardId: string, nomineeId: string) => void;
   votedAwards: string[];
+  allGuests?: any[];
 }
 
-const StandaloneRSVP: React.FC<StandaloneRSVPProps> = ({ guest, awards, onRSVP, onVote, votedAwards }) => {
+const StandaloneRSVP: React.FC<StandaloneRSVPProps> = ({ guest, awards, onRSVP, onVote, votedAwards, allGuests = [] }) => {
   const [rsvpSubmitted, setRsvpSubmitted] = useState(guest.rsvp_status !== 'pending');
   const [submitting, setSubmitting] = useState(false);
   const [selectedNominee, setSelectedNominee] = useState<{ [awardId: string]: string }>({});
@@ -393,8 +394,11 @@ const StandaloneRSVP: React.FC<StandaloneRSVPProps> = ({ guest, awards, onRSVP, 
                         disabled={votedAwards.includes(award.id)}
                       >
                         <option value="">-- Select a guest --</option>
-                        {/* This would need to be populated with actual guests */}
-                        <option value="placeholder">Placeholder Guest</option>
+                        {allGuests.map((g) => (
+                          <option key={g.id} value={g.id}>
+                            {g.first_name} {g.last_name || ''} {g.guest_id ? `(${g.guest_id})` : ''}
+                          </option>
+                        ))}
                       </select>
                     </div>
 

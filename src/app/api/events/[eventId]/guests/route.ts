@@ -1,6 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbRun, dbQuery, dbGet, uuidv4, initializeDatabase } from '@/lib/database';
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ eventId: string }> }
+) {
+  try {
+    await initializeDatabase();
+    const resolvedParams = await params;
+    
+    const guests = await dbQuery(
+      `SELECT id, first_name, last_name, guest_id, group_id, rsvp_status 
+       FROM guests 
+       WHERE event_id = ? 
+       ORDER BY first_name, last_name`,
+      [resolvedParams.eventId]
+    );
+    
+    return NextResponse.json(guests);
+  } catch (error) {
+    console.error('Error fetching guests:', error);
+    return NextResponse.json({ error: 'Failed to fetch guests' }, { status: 500 });
+  }
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ eventId: string }> }

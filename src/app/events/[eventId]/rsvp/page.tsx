@@ -42,6 +42,8 @@ export default function EventRSVPPage() {
   const [event, setEvent] = useState<EventData | null>(null);
   const [guests, setGuests] = useState<GuestData[]>([]);
   const [awards, setAwards] = useState<AwardData[]>([]);
+  const [allGuests, setAllGuests] = useState<any[]>([]);
+  const [votedAwards, setVotedAwards] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -59,6 +61,20 @@ export default function EventRSVPPage() {
           const data = await response.json();
           setEvent(data.event);
           setGuests(data.guests);
+          
+          // Fetch all guests for voting
+          const guestsResponse = await fetch(`/api/events/${eventId}/guests`);
+          if (guestsResponse.ok) {
+            const guestsData = await guestsResponse.json();
+            setAllGuests(guestsData);
+          }
+          
+          // Fetch awards
+          const awardsResponse = await fetch(`/api/events/${eventId}/awards`);
+          if (awardsResponse.ok) {
+            const awardsData = await awardsResponse.json();
+            setAwards(awardsData);
+          }
         }
       } catch (error) {
         console.error('Error fetching event data:', error);
@@ -149,6 +165,33 @@ export default function EventRSVPPage() {
       alert('Error updating RSVP.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleVote = async (awardId: string, nomineeId: string) => {
+    if (!selectedGuest) return;
+    
+    try {
+      const voteResponse = await fetch(`/api/events/${eventId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          awardId, 
+          voterId: selectedGuest.id, 
+          nomineeId 
+        }),
+      });
+
+      if (voteResponse.ok) {
+        setVotedAwards(prev => [...prev, awardId]);
+        alert('Vote submitted successfully!');
+      } else {
+        const errorData = await voteResponse.json();
+        alert(errorData.error || 'Failed to submit vote.');
+      }
+    } catch (error) {
+      console.error('Error submitting vote:', error);
+      alert('Error submitting vote.');
     }
   };
 
@@ -509,8 +552,9 @@ export default function EventRSVPPage() {
       }}
       awards={awards}
       onRSVP={handleRSVP}
-      onVote={() => {}} // Voting not implemented yet for this flow
-      votedAwards={[]}
+      onVote={handleVote}
+      votedAwards={votedAwards}
+      allGuests={allGuests}
     />
   );
 }
