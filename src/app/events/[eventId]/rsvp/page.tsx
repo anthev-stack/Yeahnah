@@ -152,82 +152,72 @@ export default function EventRSVPPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        zIndex: 10000
-      }}>
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          padding: '3rem',
-          borderRadius: '20px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-          textAlign: 'center',
-          maxWidth: '400px',
-          width: '90%'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '4px solid #f3f3f3',
-            borderTop: '4px solid #667eea',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 1rem'
-          }}></div>
-          <p style={{ margin: 0, color: '#666', fontSize: '1.1rem' }}>Loading event...</p>
-        </div>
-        <style jsx>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    );
-  }
+      if (loading) {
+        return (
+          <div style={{ 
+            minHeight: '100vh',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            fontFamily: 'system-ui, -apple-system, sans-serif'
+          }}>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              padding: '3rem',
+              borderRadius: '20px',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+              textAlign: 'center',
+              maxWidth: '400px',
+              width: '90%'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                border: '4px solid #f3f3f3',
+                borderTop: '4px solid #667eea',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 1rem'
+              }}></div>
+              <p style={{ margin: 0, color: '#666', fontSize: '1.1rem' }}>Loading event...</p>
+            </div>
+            <style jsx>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
+          </div>
+        );
+      }
 
-  if (!event) {
-    return (
-      <div style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        zIndex: 10000
-      }}>
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          padding: '3rem',
-          borderRadius: '20px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-          textAlign: 'center',
-          maxWidth: '400px',
-          width: '90%'
-        }}>
-          <X size={48} color="#ff6b6b" style={{ marginBottom: '1rem' }} />
-          <h2 style={{ marginBottom: '1rem', color: '#333' }}>Event Not Found</h2>
-          <p style={{ color: '#666', lineHeight: '1.5' }}>The event you're looking for doesn't exist or has been removed.</p>
-        </div>
-      </div>
-    );
-  }
+      if (!event) {
+        return (
+          <div style={{ 
+            minHeight: '100vh',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
+            fontFamily: 'system-ui, -apple-system, sans-serif'
+          }}>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              padding: '3rem',
+              borderRadius: '20px',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+              textAlign: 'center',
+              maxWidth: '400px',
+              width: '90%'
+            }}>
+              <X size={48} color="#ff6b6b" style={{ marginBottom: '1rem' }} />
+              <h2 style={{ marginBottom: '1rem', color: '#333' }}>Event Not Found</h2>
+              <p style={{ color: '#666', lineHeight: '1.5' }}>The event you're looking for doesn't exist or has been removed.</p>
+            </div>
+          </div>
+        );
+      }
 
   if (!selectedGuest) {
     const getThemeStyles = (theme: 'light' | 'dark' | 'love') => {
@@ -268,22 +258,16 @@ export default function EventRSVPPage() {
 
     const styles = getThemeStyles(event.template_theme);
 
-    return (
-      <div style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        background: styles.background,
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem 1rem',
-        zIndex: 10000,
-        overflow: 'auto'
-      }}>
+        return (
+          <div style={{ 
+            minHeight: '100vh',
+            background: styles.background,
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem 1rem'
+          }}>
         <div style={{
           background: styles.cardBg,
           padding: '3rem',

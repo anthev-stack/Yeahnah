@@ -105,19 +105,13 @@ const StandaloneRSVP: React.FC<StandaloneRSVPProps> = ({ guest, awards, onRSVP, 
 
   return (
     <div style={{ 
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
+      minHeight: '100vh',
       background: styles.background,
       fontFamily: 'system-ui, -apple-system, sans-serif',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '2rem 1rem',
-      zIndex: 10000,
-      overflow: 'auto'
+      padding: '2rem 1rem'
     }}>
       <div style={{
         background: styles.cardBg,
