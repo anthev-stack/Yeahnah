@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { Users, Award, TrendingUp, Filter, Download, Share2, Plus, Copy, Check, Link2 } from 'lucide-react';
+import { Users, Award, TrendingUp, Filter, Download, Share2, Plus, Copy, Check, Link2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEvent } from '@/context/EventContext';
 
 interface EventData {
@@ -41,6 +41,241 @@ interface VotingResult {
   award_title: string;
   vote_count: number;
 }
+
+interface DepartmentColumnsViewProps {
+  guests: GuestData[];
+  selectedStore: string;
+  onStoreChange: (store: string) => void;
+}
+
+const DepartmentColumnsView: React.FC<DepartmentColumnsViewProps> = ({ guests, selectedStore, onStoreChange }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // Group guests by department
+  const departments = guests.reduce((acc, guest) => {
+    const dept = guest.store_department || 'No Department';
+    if (!acc[dept]) {
+      acc[dept] = [];
+    }
+    acc[dept].push(guest);
+    return acc;
+  }, {} as Record<string, GuestData[]>);
+
+  const departmentNames = Object.keys(departments);
+
+  // Check scroll state
+  const checkScrollState = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
+
+  // Scroll functions
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    checkScrollState();
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScrollState);
+      window.addEventListener('resize', checkScrollState);
+      return () => {
+        container.removeEventListener('scroll', checkScrollState);
+        window.removeEventListener('resize', checkScrollState);
+      };
+    }
+  }, [guests]);
+
+  const getDepartmentStats = (deptGuests: GuestData[]) => {
+    const total = deptGuests.length;
+    const yes = deptGuests.filter(g => g.rsvp_status === 'yes').length;
+    const no = deptGuests.filter(g => g.rsvp_status === 'no').length;
+    const pending = deptGuests.filter(g => g.rsvp_status === 'pending').length;
+    return { total, yes, no, pending };
+  };
+
+  const showScrollControls = departmentNames.length > 3;
+
+  return (
+    <div>
+      {/* Scroll Controls */}
+      {showScrollControls && (
+        <div className="flex justify-between items-center mb-4">
+          <button
+            onClick={scrollLeft}
+            disabled={!canScrollLeft}
+            className={`btn btn-secondary ${!canScrollLeft ? 'opacity-50 cursor-not-allowed' : ''}`}
+            style={{ padding: '0.5rem', minWidth: '40px' }}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          
+          <div className="flex gap-2 flex-wrap justify-center">
+            {departmentNames.map(dept => (
+              <button
+                key={dept}
+                onClick={() => onStoreChange(dept)}
+                className={`btn ${selectedStore === dept ? 'btn-primary' : 'btn-outline'}`}
+                style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+              >
+                {dept} ({departments[dept].length})
+              </button>
+            ))}
+            <button
+              onClick={() => onStoreChange('all')}
+              className={`btn ${selectedStore === 'all' ? 'btn-primary' : 'btn-outline'}`}
+              style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+            >
+              All ({guests.length})
+            </button>
+          </div>
+
+          <button
+            onClick={scrollRight}
+            disabled={!canScrollRight}
+            className={`btn btn-secondary ${!canScrollRight ? 'opacity-50 cursor-not-allowed' : ''}`}
+            style={{ padding: '0.5rem', minWidth: '40px' }}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      )}
+
+      {/* Department Columns */}
+      <div
+        ref={scrollContainerRef}
+        className="department-columns-container"
+        style={{
+          display: 'flex',
+          gap: '1rem',
+          overflowX: 'auto',
+          paddingBottom: '1rem',
+          scrollBehavior: 'smooth',
+          scrollbarWidth: 'thin'
+        }}
+      >
+        {departmentNames.map(dept => {
+          const deptGuests = departments[dept];
+          const stats = getDepartmentStats(deptGuests);
+          
+          return (
+            <div
+              key={dept}
+              className="department-column"
+              style={{
+                minWidth: '300px',
+                maxWidth: '350px',
+                flex: '1 1 300px',
+                background: '#f8f9fa',
+                borderRadius: '12px',
+                padding: '1rem',
+                border: selectedStore === dept ? '2px solid #667eea' : '1px solid #e9ecef'
+              }}
+            >
+              {/* Department Header */}
+              <div className="flex justify-between items-center mb-3">
+                <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>
+                  {dept}
+                </h4>
+                <div className="flex gap-1">
+                  <span style={{ fontSize: '0.8rem', color: '#28a745' }}>{stats.yes}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#dc3545' }}>{stats.no}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#ffc107' }}>{stats.pending}</span>
+                </div>
+              </div>
+
+              {/* Department Stats */}
+              <div className="grid grid-3 gap-2 mb-3" style={{ fontSize: '0.8rem' }}>
+                <div className="text-center">
+                  <div style={{ fontWeight: 'bold', color: '#28a745' }}>{stats.yes}</div>
+                  <div style={{ color: '#666' }}>Coming</div>
+                </div>
+                <div className="text-center">
+                  <div style={{ fontWeight: 'bold', color: '#dc3545' }}>{stats.no}</div>
+                  <div style={{ color: '#666' }}>Not Coming</div>
+                </div>
+                <div className="text-center">
+                  <div style={{ fontWeight: 'bold', color: '#ffc107' }}>{stats.pending}</div>
+                  <div style={{ color: '#666' }}>Pending</div>
+                </div>
+              </div>
+
+              {/* Department Guests */}
+              <div className="department-guests-list" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                {deptGuests.map(guest => (
+                  <div
+                    key={guest.id}
+                    className="department-guest-item"
+                    style={{
+                      padding: '0.75rem',
+                      marginBottom: '0.5rem',
+                      background: 'white',
+                      borderRadius: '8px',
+                      border: '1px solid #e9ecef'
+                    }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div style={{ fontWeight: '500', fontSize: '0.9rem' }}>
+                          {guest.first_name} {guest.last_name}
+                        </div>
+                        {guest.email && (
+                          <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                            {guest.email}
+                          </div>
+                        )}
+                        {guest.guest_id && (
+                          <div style={{ fontSize: '0.7rem', color: '#888' }}>
+                            ID: {guest.guest_id}
+                          </div>
+                        )}
+                      </div>
+                      <span className={`status-badge status-${guest.rsvp_status}`} style={{ fontSize: '0.8rem' }}>
+                        {guest.rsvp_status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* CSS for smooth scrolling */}
+      <style jsx>{`
+        .department-columns-container::-webkit-scrollbar {
+          height: 8px;
+        }
+        .department-columns-container::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 4px;
+        }
+        .department-columns-container::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 4px;
+        }
+        .department-columns-container::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
+        }
+      `}</style>
+    </div>
+  );
+};
 
 export default function EventDashboardPage() {
   const params = useParams();
@@ -318,33 +553,43 @@ export default function EventDashboardPage() {
             </div>
           </div>
 
-          <div className="list">
-            {filteredGuests.map((guest) => (
-              <div key={guest.id} className="list-item">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4>{guest.first_name} {guest.last_name}</h4>
-                    {guest.email && <p style={{ fontSize: '0.9rem', color: '#666' }}>{guest.email}</p>}
-                    {guest.store_department && (
-                      <p style={{ fontSize: '0.8rem', color: '#888' }}>
-                        {guest.store_department}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`status-badge status-${guest.rsvp_status}`}>
-                      {guest.rsvp_status}
-                    </span>
-                    {guest.guest_id && (
-                      <span style={{ fontSize: '0.8rem', color: '#888' }}>
-                        ID: {guest.guest_id}
+          {/* Department Columns Layout for Multi-Store Events */}
+          {event.multi_store_enabled ? (
+            <DepartmentColumnsView 
+              guests={guests}
+              selectedStore={selectedStore}
+              onStoreChange={setSelectedStore}
+            />
+          ) : (
+            /* Regular List View for Single-Store Events */
+            <div className="list">
+              {filteredGuests.map((guest) => (
+                <div key={guest.id} className="list-item">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4>{guest.first_name} {guest.last_name}</h4>
+                      {guest.email && <p style={{ fontSize: '0.9rem', color: '#666' }}>{guest.email}</p>}
+                      {guest.store_department && (
+                        <p style={{ fontSize: '0.8rem', color: '#888' }}>
+                          {guest.store_department}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`status-badge status-${guest.rsvp_status}`}>
+                        {guest.rsvp_status}
                       </span>
-                    )}
+                      {guest.guest_id && (
+                        <span style={{ fontSize: '0.8rem', color: '#888' }}>
+                          ID: {guest.guest_id}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           <div style={{ marginTop: '2rem' }}>
             <div className="flex justify-between items-center mb-4">
