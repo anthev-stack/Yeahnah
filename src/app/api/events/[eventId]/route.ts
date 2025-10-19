@@ -36,7 +36,7 @@ export async function PUT(
     await initializeDatabase();
     
     const resolvedParams = await params;
-    const { title, description, event_type, event_date, multi_store_enabled } = await request.json();
+    const { title, description, event_type, event_date, multi_store_enabled, award_voting_scope } = await request.json();
     
     // Check if the event exists and belongs to the user
     const event = await dbGet('SELECT * FROM events WHERE id = ? AND host_id = ?', [resolvedParams.eventId, session.user.id]);
@@ -46,9 +46,9 @@ export async function PUT(
     
     await dbRun(
       `UPDATE events 
-       SET title = ?, description = ?, event_type = ?, event_date = ?, multi_store_enabled = ?
+       SET title = ?, description = ?, event_type = ?, event_date = ?, multi_store_enabled = ?, award_voting_scope = ?
        WHERE id = ? AND host_id = ?`,
-      [title, description, event_type, event_date, multi_store_enabled ? 1 : 0, resolvedParams.eventId, session.user.id]
+      [title, description, event_type, event_date, multi_store_enabled ? 1 : 0, award_voting_scope || 'all', resolvedParams.eventId, session.user.id]
     );
     
     return NextResponse.json({ message: 'Event updated successfully' });

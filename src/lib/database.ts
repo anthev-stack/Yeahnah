@@ -33,6 +33,7 @@ export const initializeDatabase = async () => {
         description TEXT,
         event_type TEXT NOT NULL CHECK (event_type IN ('business', 'personal')),
         multi_store_enabled BOOLEAN DEFAULT FALSE,
+        award_voting_scope TEXT DEFAULT 'all' CHECK (award_voting_scope IN ('all', 'department')),
         event_date DATE NOT NULL,
         template_theme TEXT DEFAULT 'light' CHECK (template_theme IN ('light', 'dark', 'love')),
         logo_url TEXT,

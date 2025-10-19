@@ -43,12 +43,30 @@ export async function GET(
     await initializeDatabase();
     
     const resolvedParams = await params;
-    const guests = await dbQuery(
-      `SELECT g.*, gr.name as group_name FROM guests g 
-       LEFT JOIN groups gr ON g.group_id = gr.id 
-       WHERE g.event_id = ? ORDER BY gr.name, g.first_name`,
-      [resolvedParams.eventId]
-    );
+    const { searchParams } = new URL(request.url);
+    const filterDepartment = searchParams.get('department');
+    const excludeGuestId = searchParams.get('excludeGuestId');
+    
+    let query = `SELECT g.*, gr.name as group_name FROM guests g 
+                 LEFT JOIN groups gr ON g.group_id = gr.id 
+                 WHERE g.event_id = ?`;
+    let queryParams = [resolvedParams.eventId];
+    
+    // Filter by department if specified
+    if (filterDepartment) {
+      query += ` AND gr.name = ?`;
+      queryParams.push(filterDepartment);
+    }
+    
+    // Exclude a specific guest if specified (for voting, exclude the voter)
+    if (excludeGuestId) {
+      query += ` AND g.id != ?`;
+      queryParams.push(excludeGuestId);
+    }
+    
+    query += ` ORDER BY gr.name, g.first_name`;
+    
+    const guests = await dbQuery(query, queryParams);
     
     return NextResponse.json(guests);
   } catch (error) {

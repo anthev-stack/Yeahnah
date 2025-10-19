@@ -62,12 +62,8 @@ export default function EventRSVPPage() {
           setEvent(data.event);
           setGuests(data.guests);
           
-          // Fetch all guests for voting
-          const guestsResponse = await fetch(`/api/events/${eventId}/guests`);
-          if (guestsResponse.ok) {
-            const guestsData = await guestsResponse.json();
-            setAllGuests(guestsData);
-          }
+          // Fetch guests for voting based on event settings
+          // We'll fetch this later when we know which guest is voting
           
           // Fetch awards
           const awardsResponse = await fetch(`/api/events/${eventId}/awards`);
@@ -87,6 +83,27 @@ export default function EventRSVPPage() {
       fetchEventData();
     }
   }, [eventId]);
+
+  const fetchGuestsForVoting = async (guest: GuestData) => {
+    if (!event) return;
+    
+    try {
+      let url = `/api/events/${eventId}/guests?excludeGuestId=${guest.id}`;
+      
+      // If multi-store is enabled and award voting scope is department-only, filter by department
+      if (event.multi_store_enabled && event.award_voting_scope === 'department' && guest.group_name) {
+        url += `&department=${encodeURIComponent(guest.group_name)}`;
+      }
+      
+      const guestsResponse = await fetch(url);
+      if (guestsResponse.ok) {
+        const guestsData = await guestsResponse.json();
+        setAllGuests(guestsData);
+      }
+    } catch (error) {
+      console.error('Error fetching guests for voting:', error);
+    }
+  };
 
   const findGuest = async () => {
     if (searchMethod === 'name' && !firstName.trim()) {
@@ -125,6 +142,8 @@ export default function EventRSVPPage() {
       if (foundGuest.rsvp_status !== 'pending') {
         setRsvpSubmitted(true);
       }
+      // Fetch guests for voting based on the selected guest and event settings
+      fetchGuestsForVoting(foundGuest);
     } else {
       alert('Guest not found. Please check your name or guest ID and try again.');
     }
@@ -546,6 +565,7 @@ export default function EventRSVPPage() {
         event_title: event.title,
         event_type: event.event_type,
         multi_store_enabled: event.multi_store_enabled,
+        award_voting_scope: event.award_voting_scope,
         event_date: event.event_date,
         template_theme: event.template_theme,
         logo_url: event.logo_url

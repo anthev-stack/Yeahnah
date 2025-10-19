@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     await initializeDatabase();
     
-    const { title, description, eventType, multiStoreEnabled, eventDate, hostName, hostEmail, hostId, templateTheme, logoUrl } = await request.json();
+    const { title, description, eventType, multiStoreEnabled, awardVotingScope, eventDate, hostName, hostEmail, hostId, templateTheme, logoUrl } = await request.json();
     
     if (!hostId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -19,9 +19,9 @@ export async function POST(request: NextRequest) {
     const eventId = uuidv4();
     
     await dbRun(
-      `INSERT INTO events (id, title, description, event_type, multi_store_enabled, event_date, template_theme, logo_url, host_id, host_name, host_email) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [eventId, title, description, eventType, multiStoreEnabled ? 1 : 0, eventDate, templateTheme || 'light', logoUrl || null, hostId, hostName, hostEmail]
+      `INSERT INTO events (id, title, description, event_type, multi_store_enabled, award_voting_scope, event_date, template_theme, logo_url, host_id, host_name, host_email) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [eventId, title, description, eventType, multiStoreEnabled ? 1 : 0, awardVotingScope || 'all', eventDate, templateTheme || 'light', logoUrl || null, hostId, hostName, hostEmail]
     );
     
     return NextResponse.json({ eventId, message: 'Event created successfully' });

@@ -12,6 +12,7 @@ interface EventData {
   event_type: 'business' | 'personal';
   event_date: string;
   multi_store_enabled: boolean;
+  award_voting_scope: 'all' | 'department';
   created_at: string;
 }
 
@@ -229,7 +230,8 @@ export default function EventsPage() {
                 description: formData.get('description') as string,
                 event_type: formData.get('event_type') as 'business' | 'personal',
                 event_date: formData.get('event_date') as string,
-                multi_store_enabled: formData.get('multi_store_enabled') === 'on'
+                multi_store_enabled: formData.get('multi_store_enabled') === 'on',
+                award_voting_scope: formData.get('award_voting_scope') as 'all' | 'department'
               };
               handleEditEvent(updatedEvent);
             }}>
@@ -273,7 +275,7 @@ export default function EventsPage() {
                   required
                 />
               </div>
-              <div className="mb-6">
+              <div className="mb-4">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
@@ -284,6 +286,34 @@ export default function EventsPage() {
                   Enable Multi-Group Management
                 </label>
               </div>
+              
+              {editingEvent.multi_store_enabled && (
+                <div className="mb-6">
+                  <label className="block text-sm font-medium mb-2">Award Voting Scope</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="award_voting_scope"
+                        value="all"
+                        defaultChecked={editingEvent.award_voting_scope === 'all'}
+                        className="mr-2"
+                      />
+                      All Departments
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="award_voting_scope"
+                        value="department"
+                        defaultChecked={editingEvent.award_voting_scope === 'department'}
+                        className="mr-2"
+                      />
+                      Same Department Only
+                    </label>
+                  </div>
+                </div>
+              )}
               <div className="flex gap-2">
                 <button
                   type="button"

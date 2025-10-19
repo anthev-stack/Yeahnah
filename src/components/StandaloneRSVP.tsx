@@ -15,6 +15,7 @@ interface GuestData {
   event_title: string;
   event_type: 'business' | 'personal';
   multi_store_enabled: boolean;
+  award_voting_scope?: 'all' | 'department';
   event_date: string;
   template_theme: 'light' | 'dark' | 'love';
   logo_url?: string;

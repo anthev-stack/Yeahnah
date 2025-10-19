@@ -45,6 +45,7 @@ export default function CreateEventPage() {
     description: '',
     eventType: 'personal' as 'business' | 'personal',
     multiStoreEnabled: false,
+    awardVotingScope: 'all' as 'all' | 'department',
     eventDate: '',
     hostName: '',
     hostEmail: '',
@@ -335,6 +336,38 @@ export default function CreateEventPage() {
                   Enable multi-group functionality (stores, departments, states, etc.)
                 </label>
               </div>
+
+              {/* Award Voting Scope Toggle - only show when multi-store is enabled */}
+              {eventData.multiStoreEnabled && (
+                <div className="form-field" style={{ marginTop: '1rem' }}>
+                  <label className="form-label">Award Voting Scope</label>
+                  <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>
+                    When voting for awards, should guests see colleagues from all departments or only their own department?
+                  </p>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="awardVotingScope"
+                        value="all"
+                        checked={eventData.awardVotingScope === 'all'}
+                        onChange={(e) => handleEventDataChange('awardVotingScope', e.target.value)}
+                      />
+                      <span>All Departments</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="awardVotingScope"
+                        value="department"
+                        checked={eventData.awardVotingScope === 'department'}
+                        onChange={(e) => handleEventDataChange('awardVotingScope', e.target.value)}
+                      />
+                      <span>Same Department Only</span>
+                    </label>
+                  </div>
+                </div>
+              )}
               
               {eventData.multiStoreEnabled && (
                 <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid #e1e5e9', borderRadius: '8px' }}>
