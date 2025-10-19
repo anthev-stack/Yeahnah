@@ -43,14 +43,8 @@ const Header: React.FC = () => {
         </nav>
 
         <div className="nav-actions">
-          <Link href="/contact" className="btn-contact">
-            Contact
-          </Link>
           {session ? (
             <div className="flex items-center gap-2">
-              <Link href="/dashboard" className="btn-dashboard">
-                Dashboard
-              </Link>
               <div className="profile-icon">
                 {session.user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
