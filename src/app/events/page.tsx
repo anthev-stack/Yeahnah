@@ -187,16 +187,24 @@ export default function EventsPage() {
                     View Dashboard
                   </Link>
                   <button
-                    onClick={() => setEditingEvent(event)}
-                    className="btn btn-outline p-2"
+                    onClick={() => {
+                      console.log('Edit button clicked for event:', event.id);
+                      setEditingEvent(event);
+                    }}
+                    className="btn btn-outline px-3 py-2"
                     title="Edit Event"
+                    style={{ minWidth: '40px', minHeight: '40px' }}
                   >
                     <Edit size={16} />
                   </button>
                   <button
-                    onClick={() => setDeleteConfirm(event.id)}
-                    className="btn btn-outline p-2 text-red-600 hover:bg-red-50"
+                    onClick={() => {
+                      console.log('Delete button clicked for event:', event.id);
+                      setDeleteConfirm(event.id);
+                    }}
+                    className="btn btn-outline px-3 py-2 text-red-600 hover:bg-red-50 hover:border-red-300"
                     title="Delete Event"
+                    style={{ minWidth: '40px', minHeight: '40px' }}
                   >
                     <Trash2 size={16} />
                   </button>
