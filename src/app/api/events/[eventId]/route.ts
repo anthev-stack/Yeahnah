@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 import { dbGet, dbQuery, dbRun, initializeDatabase } from '@/lib/database';
 
 export async function GET(
@@ -26,16 +27,28 @@ export async function PUT(
   { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
+    const session = await getServerSession();
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     await initializeDatabase();
     
     const resolvedParams = await params;
     const { title, description, event_type, event_date, multi_store_enabled } = await request.json();
     
+    // Check if the event exists and belongs to the user
+    const event = await dbGet('SELECT * FROM events WHERE id = ? AND host_id = ?', [resolvedParams.eventId, session.user.id]);
+    if (!event) {
+      return NextResponse.json({ error: 'Event not found or access denied' }, { status: 404 });
+    }
+    
     await dbRun(
       `UPDATE events 
        SET title = ?, description = ?, event_type = ?, event_date = ?, multi_store_enabled = ?
-       WHERE id = ?`,
-      [title, description, event_type, event_date, multi_store_enabled ? 1 : 0, resolvedParams.eventId]
+       WHERE id = ? AND host_id = ?`,
+      [title, description, event_type, event_date, multi_store_enabled ? 1 : 0, resolvedParams.eventId, session.user.id]
     );
     
     return NextResponse.json({ message: 'Event updated successfully' });
@@ -50,16 +63,28 @@ export async function DELETE(
   { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
+    const session = await getServerSession();
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     await initializeDatabase();
     
     const resolvedParams = await params;
+    
+    // Check if the event exists and belongs to the user
+    const event = await dbGet('SELECT * FROM events WHERE id = ? AND host_id = ?', [resolvedParams.eventId, session.user.id]);
+    if (!event) {
+      return NextResponse.json({ error: 'Event not found or access denied' }, { status: 404 });
+    }
     
     // Delete related data first (guests, groups, etc.)
     await dbRun('DELETE FROM guests WHERE event_id = ?', [resolvedParams.eventId]);
     await dbRun('DELETE FROM groups WHERE event_id = ?', [resolvedParams.eventId]);
     
     // Delete the event
-    await dbRun('DELETE FROM events WHERE id = ?', [resolvedParams.eventId]);
+    await dbRun('DELETE FROM events WHERE id = ? AND host_id = ?', [resolvedParams.eventId, session.user.id]);
     
     return NextResponse.json({ message: 'Event deleted successfully' });
   } catch (error) {

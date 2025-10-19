@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 import { dbRun, dbGet, dbQuery, uuidv4, initializeDatabase } from '@/lib/database';
 
 export async function POST(request: NextRequest) {
@@ -32,19 +33,25 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession();
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     await initializeDatabase();
     
     const { searchParams } = new URL(request.url);
     const eventId = searchParams.get('eventId');
     
     if (!eventId) {
-      // Return all events
-      const events = await dbQuery('SELECT * FROM events ORDER BY created_at DESC');
+      // Return events for the authenticated user
+      const events = await dbQuery('SELECT * FROM events WHERE host_id = ? ORDER BY created_at DESC', [session.user.id]);
       return NextResponse.json(events);
     }
     
-    // Return specific event
-    const event = await dbGet('SELECT * FROM events WHERE id = ?', [eventId]);
+    // Return specific event if it belongs to the user
+    const event = await dbGet('SELECT * FROM events WHERE id = ? AND host_id = ?', [eventId, session.user.id]);
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }

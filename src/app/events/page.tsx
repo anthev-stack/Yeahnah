@@ -130,7 +130,7 @@ export default function EventsPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {events.map((event) => {
             const eventDate = new Date(event.event_date);
             const isUpcoming = eventDate >= new Date();
