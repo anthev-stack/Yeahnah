@@ -554,6 +554,15 @@ export default function EventDashboardPage() {
           </div>
 
           {/* Department Columns Layout for Multi-Store Events */}
+          {(() => {
+            console.log('Event data:', { 
+              multi_store_enabled: event.multi_store_enabled, 
+              event_type: event.event_type,
+              guests_count: guests.length,
+              departments: guests.map(g => g.store_department).filter(Boolean)
+            });
+            return null;
+          })()}
           {event.multi_store_enabled ? (
             <DepartmentColumnsView 
               guests={guests}
