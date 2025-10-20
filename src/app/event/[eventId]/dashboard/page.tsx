@@ -563,7 +563,7 @@ export default function EventDashboardPage() {
             });
             return null;
           })()}
-          {event.multi_store_enabled ? (
+          {(event.multi_store_enabled || getUniqueStores().length > 1) ? (
             <DepartmentColumnsView 
               guests={guests}
               selectedStore={selectedStore}
