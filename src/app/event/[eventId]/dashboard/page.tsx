@@ -300,15 +300,36 @@ export default function EventDashboardPage() {
       try {
         // Fetch event details
         const eventResponse = await fetch(`/api/events?eventId=${eventId}`);
-        const eventData = await eventResponse.json();
-        setEvent(eventData);
-        setCurrentEvent(eventData);
+        if (!eventResponse.ok) {
+          if (eventResponse.status === 401) {
+            // Try to fetch without authentication for public viewing
+            const publicEventResponse = await fetch(`/api/events/${eventId}`);
+            if (publicEventResponse.ok) {
+              const publicEventData = await publicEventResponse.json();
+              setEvent(publicEventData);
+              setCurrentEvent(publicEventData);
+            } else {
+              throw new Error('Event not found or access denied');
+            }
+          } else {
+            throw new Error('Failed to fetch event data');
+          }
+        } else {
+          const eventData = await eventResponse.json();
+          setEvent(eventData);
+          setCurrentEvent(eventData);
+        }
 
         // Fetch guests
         const guestsResponse = await fetch(`/api/events/${eventId}/guests`);
-        const guestsData = await guestsResponse.json();
-        setGuests(guestsData);
-        setContextGuests(guestsData);
+        if (guestsResponse.ok) {
+          const guestsData = await guestsResponse.json();
+          console.log('Guests data:', guestsData);
+          setGuests(guestsData);
+          setContextGuests(guestsData);
+        } else {
+          console.error('Failed to fetch guests:', guestsResponse.status);
+        }
 
         // Fetch awards
         const awardsResponse = await fetch(`/api/events/${eventId}/awards`);
